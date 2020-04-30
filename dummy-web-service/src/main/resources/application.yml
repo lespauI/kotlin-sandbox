@@ -1,0 +1,31 @@
+
+server:
+  port: 8000
+
+management:
+  server:
+    port: 8001
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      path-mapping:
+        health: /healthcheck
+        info: /status
+        ping: /ping
+      base-path: /admin
+      exposure:
+        include:
+          - health
+          - info
+          - ping
+
+info:
+  name: Dummy Service
+  version: @project.version@
+  timezone: "Europe/London"
+  build:
+    version: @project.version@
+
+token:
