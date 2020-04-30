@@ -8,6 +8,7 @@ import com.codeborne.selenide.Selenide.*
 import kt.sandbox.utils.Bot
 import kt.sandbox.utils.UserHolder
 import org.openqa.selenium.By
+import org.openqa.selenium.WebDriver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,8 +29,9 @@ class DaddyController {
         val message = body.get("content").orEmpty()
         when {
             message.contains("gamerecap") -> {
-                this.gameId = message.replace(Regex(".*/gamerecap/"), "")
-                open(message.replace(Regex(".*http://"), "http://"))
+                //TODO refactor
+                this.gameId = message.replace(Regex(".*\n.*/gamerecap/"), "")
+                open(message.replace(Regex(".*(|\n)http://"), "http://"))
                 element(By.cssSelector(downloadBtn)).click()
                 bot.sendText(chat_id, message)
                 bot.sendPhoto(chat_id, gameId)

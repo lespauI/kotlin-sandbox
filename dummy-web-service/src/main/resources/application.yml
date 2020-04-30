@@ -1,10 +1,10 @@
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 management:
   server:
-    port: 8081
+    port: ${PORT:8080}
   endpoint:
     health:
       show-details: always
@@ -29,3 +29,6 @@ info:
     version: @project.version@
 
 token:
+
+GOOGLE_CHROME_PATH : '/app/.apt/usr/bin/google_chrome'
+CHROMEDRIVER_PATH : '/app/.chromedriver/bin/chromedriver'
