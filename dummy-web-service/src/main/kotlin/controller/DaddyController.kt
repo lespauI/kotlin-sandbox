@@ -9,6 +9,7 @@ import kt.sandbox.utils.Bot
 import kt.sandbox.utils.UserHolder
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,6 +17,8 @@ import javax.websocket.server.PathParam
 
 @RestController
 class DaddyController {
+
+    val logger = LoggerFactory.getLogger(javaClass)
 
     @Value("\${token}")
     val token: String? = ""
@@ -26,12 +29,22 @@ class DaddyController {
     @PostMapping("/daddyleague/{chat_id}")
     fun postWebHook(@RequestBody body: Map<String, String>, @PathVariable chat_id: Long) {
         var bot = Bot(token)
-        val message = body.get("content").orEmpty()
+        logger.info(body.toString())
+
+        var message = body.get("content").orEmpty()
+        if (message == "")
+            message = body.get("text").orEmpty()
+        logger.info("message = $message")
+
         when {
             message.contains("gamerecap") -> {
                 //TODO refactor
-                this.gameId = message.replace(Regex(".*\n.*/gamerecap/"), "")
-                open(message.replace(Regex(".*(|\n)http://"), "http://"))
+                val link = message.replaceBefore("http://", "")
+                this.gameId = message.replaceBefore("/gamerecap/", "")
+                    .replace("/gamerecap/", "")
+                logger.info("link = $link")
+                logger.info("gameId = $gameId")
+                open(link)
                 element(By.cssSelector(downloadBtn)).click()
                 bot.sendText(chat_id, message)
                 bot.sendPhoto(chat_id, gameId)
