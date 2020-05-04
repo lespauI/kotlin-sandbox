@@ -44,7 +44,7 @@ class DaddyProcessor @Autowired constructor(
                 Selenide.closeWebDriver()
             }
             message.contains("advanced to week") -> {
-                bot.sendLocalAnimation(chat_id, "gifs/advanced.mp4", message)
+                bot.sendLocalAnimation(chat_id, "dummy-web-service/gifs/advanced.mp4", message)
             }
             else -> {
                 bot.sendText(chat_id, message)

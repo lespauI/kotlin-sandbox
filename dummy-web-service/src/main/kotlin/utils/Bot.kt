@@ -5,9 +5,8 @@ import com.pengrad.telegrambot.request.SendAnimation
 import com.pengrad.telegrambot.request.SendMessage
 import com.pengrad.telegrambot.request.SendPhoto
 import org.slf4j.LoggerFactory
-import org.springframework.util.ResourceUtils
 import java.io.File
-import java.io.InputStream
+
 
 class Bot(token: String?) {
 
@@ -28,14 +27,14 @@ class Bot(token: String?) {
             }
         else {
             Thread.sleep(10000)
-            if(file.exists())
+            if (file.exists())
                 try {
                     bot.execute(sendPhoto)
                 } finally {
                     file.delete()
                 }
             else {
-                file = ResourceUtils.getFile("classpath:gifs/fail.gif")
+                file = File("dummy-web-service/gifs/fail.gif")
                 bot.execute(SendAnimation(chatId, file).caption(message))
             }
         }
@@ -48,8 +47,8 @@ class Bot(token: String?) {
     fun sendAnimation(chatId: Long, animation_url: String, caption: String) {
         bot.execute(SendAnimation(chatId, animation_url).caption(caption))
     }
+
     fun sendLocalAnimation(chatId: Long, fileName: String, caption: String) {
-        val file = ResourceUtils.getFile("classpath:$fileName")
-        bot.execute(SendAnimation(chatId, file).caption(caption))
+        bot.execute(SendAnimation(chatId, File(fileName)).caption(caption))
     }
 }

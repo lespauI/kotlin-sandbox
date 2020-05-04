@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.*
 import kt.sandbox.processor.DaddyProcessor
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import java.lang.Exception
 
 @RestController
@@ -20,19 +22,31 @@ class DaddyController(
     val logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/daddyleague/{chat_id}")
-    fun postWebHook(@RequestBody body: Map<String, String>, @PathVariable chat_id: Long) {
+    fun postWebHook(@RequestBody body: Map<String, String>, @PathVariable chat_id: Long): ResponseEntity<String> {
         try {
             daddyProcessor.parseMessage(chat_id, body)
+            return ResponseEntity("Is Ok!", HttpStatus.OK)
+
         } catch (e: Exception) {
-            logger.error(e.message)
+            logger.error("Exception! $e.message")
             logger.info("Second try")
-            daddyProcessor.parseMessage(chat_id, body)
+            try {
+                daddyProcessor.parseMessage(chat_id, body)
+                return ResponseEntity("Is Ok!", HttpStatus.OK)
+            } catch (e: Exception) {
+                return ResponseEntity(":(", HttpStatus.INTERNAL_SERVER_ERROR)
+            }
         }
     }
 
     @GetMapping("/daddyleague/rage/{chat_id}")
-    fun rage(@PathVariable chat_id: Long) {
-        daddyProcessor.rage(chat_id)
+    fun rage(@PathVariable chat_id: Long): ResponseEntity<String> {
+        try {
+            daddyProcessor.rage(chat_id)
+            return ResponseEntity("Is Ok!", HttpStatus.OK)
+        } catch (e: Exception) {
+            return ResponseEntity(":(", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
 }
