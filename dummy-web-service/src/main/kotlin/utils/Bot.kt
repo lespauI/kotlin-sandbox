@@ -16,9 +16,9 @@ class Bot(token: String?) {
 
     var bot = TelegramBot(token)
 
-    fun sendGameRecap(chatId: Long, gameId: String, message: String) {
+    fun sendGameRecap(chat_id: Long, gameId: String, message: String) {
         var file = File("$path_to_recap/$gameId.png")
-        val sendPhoto = SendPhoto(chatId, file).caption(message)
+        val sendPhoto = SendPhoto(chat_id, file).caption(message)
         if (file.exists())
             try {
                 bot.execute(sendPhoto)
@@ -34,21 +34,29 @@ class Bot(token: String?) {
                     file.delete()
                 }
             else {
-                file = File("dummy-web-service/gifs/fail.gif")
-                bot.execute(SendAnimation(chatId, file).caption(message))
+                sendFail(chat_id, message)
             }
         }
     }
 
-    fun sendText(chatId: Long, message: String) {
-        bot.execute(SendMessage(chatId, message))
+    fun sendText(chat_id: Long, message: String) {
+        bot.execute(SendMessage(chat_id, message))
     }
 
-    fun sendAnimation(chatId: Long, animation_url: String, caption: String) {
-        bot.execute(SendAnimation(chatId, animation_url).caption(caption))
+    fun sendAnimation(chat_id: Long, animation_url: String, caption: String) {
+        bot.execute(SendAnimation(chat_id, animation_url).caption(caption))
     }
 
-    fun sendLocalAnimation(chatId: Long, fileName: String, caption: String) {
-        bot.execute(SendAnimation(chatId, File(fileName)).caption(caption))
+    fun sendPic(chat_id: Long, file: File, caption: String) {
+        bot.execute(SendPhoto(chat_id, file).caption(caption))
+    }
+
+    fun sendFail(chat_id: Long, message: String) {
+        bot.execute(
+            SendAnimation(
+                chat_id,
+                "https://media.giphy.com/media/Sv9XNImzlvO2JuSnMk/giphy.gif"
+            ).caption(message)
+        )
     }
 }

@@ -29,13 +29,7 @@ class DaddyController(
 
         } catch (e: Exception) {
             logger.error("Exception! $e.message")
-            logger.info("Second try")
-            try {
-                daddyProcessor.parseMessage(chat_id, body)
-                return ResponseEntity("Is Ok!", HttpStatus.OK)
-            } catch (e: Exception) {
-                return ResponseEntity(":(", HttpStatus.INTERNAL_SERVER_ERROR)
-            }
+            return ResponseEntity(":(", HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
