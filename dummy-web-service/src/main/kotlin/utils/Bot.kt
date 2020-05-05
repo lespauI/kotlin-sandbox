@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.SendAnimation
 import com.pengrad.telegrambot.request.SendMessage
 import com.pengrad.telegrambot.request.SendPhoto
+import com.pengrad.telegrambot.request.SendPoll
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -16,27 +17,12 @@ class Bot(token: String?) {
 
     var bot = TelegramBot(token)
 
+    @Deprecated("to remove")
     fun sendGameRecap(chat_id: Long, gameId: String, message: String) {
         var file = File("$path_to_recap/$gameId.png")
         val sendPhoto = SendPhoto(chat_id, file).caption(message)
-        if (file.exists())
-            try {
-                bot.execute(sendPhoto)
-            } finally {
-                file.delete()
-            }
-        else {
-            Thread.sleep(10000)
-            if (file.exists())
-                try {
-                    bot.execute(sendPhoto)
-                } finally {
-                    file.delete()
-                }
-            else {
-                sendFail(chat_id, message)
-            }
-        }
+        bot.execute(sendPhoto)
+        file.delete()
     }
 
     fun sendText(chat_id: Long, message: String) {
@@ -49,6 +35,10 @@ class Bot(token: String?) {
 
     fun sendPic(chat_id: Long, file: File, caption: String) {
         bot.execute(SendPhoto(chat_id, file).caption(caption))
+    }
+
+    fun sendPool(chat_id: Long, question: String, vararg options: String) {
+        bot.execute(SendPoll(chat_id, question, *options).isAnonymous(false))
     }
 
     fun sendFail(chat_id: Long, message: String) {

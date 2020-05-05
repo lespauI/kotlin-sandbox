@@ -24,13 +24,12 @@ class DaddyProcessor @Autowired constructor(
     val logger = LoggerFactory.getLogger(javaClass)
 
     val playerOverCss = ".pull-right.cfm-team-ovr"
-    val link = "http://daddyleagues.com/uflrus/"
+    val link = "http://daddyleagues.com/uflrus"
 
     val bot = Bot(token)
 
     fun parseMessage(chat_id: Long, body: Map<String, String>) {
-        Configuration.browserSize = "1290x620"
-        Configuration.browserCapabilities.setCapability("arguments","--hide-scrollbars")
+        Configuration.browserSize = "1290x800"
         logger.info(body.toString())
 
         var message = body.get("content").orEmpty()
@@ -38,53 +37,81 @@ class DaddyProcessor @Autowired constructor(
             message = body.get("text").orEmpty()
         logger.info("message = $message")
 
-        when {
-            message.contains("gamerecap") -> {
-                //TODO refactor
-                val link = message.replaceBefore("http://", "")
-                logger.info("link = $link")
-                Configuration.browserSize = "1290x620"
-                Selenide.open(link)
-                bot.sendPic(chat_id,
-                    Selenide.element(By.cssSelector("#gamerecapdownload")).getScreenshotAs(FILE),
-                    message)
-                Selenide.closeWebDriver()
-                //bot.sendGameRecap(chat_id, gameId, message)
-            }
-            message.contains("advanced to week") -> {
-                try {
-                    Configuration.browserSize = "450x550"
-                    Selenide.open(this.link)
-                    Selenide.element(By.cssSelector("#weekgame")).scrollTo()
-                    bot.sendPic(chat_id, Screenshots.takeScreenShotAsFile(), message)
-                } catch (e: Exception) {
-                    bot.sendFail(chat_id, message)
-                    throw e
-                } finally {
-                    Selenide.closeWebDriver()
+        try {
+            when {
+                message.contains("gamerecap") -> {
+                    //TODO refactor
+                    val link = message.replaceBefore("http://", "")
+                    logger.info("link = $link")
+                    Configuration.browserSize = "1288x538"
+                    Selenide.open(link)
+                    //TODO add normal wait
+                    Thread.sleep(2000)
+                    sendItemAsPic(chat_id, "#gamesummary", message)
                 }
-            }
-            message.contains(Regex("Released|Signed")) -> {
-                var gif = ""
-                when {
-                    message.contains("Released") -> gif =
-                        "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
-                    message.contains("Signed") -> gif = "https://media.giphy.com/media/KHVexxqBrUvAfjhfAg/giphy.gif"
-                }
-                val link = message.replaceBefore("http://", "")
-                Selenide.open(link)
-                var over = Selenide.element(By.cssSelector(playerOverCss)).text()
-                if (Integer.parseInt(over.dropLast(4)) >= 74) {
-                    bot.sendAnimation(chat_id, gif, "$message \n$over")
-                }
-                Selenide.closeWebDriver()
-            }
-            else -> {
-                bot.sendText(chat_id, message)
-            }
+                message.contains("advanced to week") -> {
 
+                    //getSchedules(chat_id, message)
+                    bot.sendText(chat_id, message)
+
+                    Selenide.open(link)
+                    //sendItemAsPic(chat_id, "#weekplayer", "Players Of the Week")
+                    bot.sendPic(
+                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 5)
+                            .getScreenshotAs(FILE), "Игрок нападения"
+                    )
+
+                    bot.sendPic(
+                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 6)
+                            .getScreenshotAs(FILE), "Игрок защиты"
+                    )
+
+                    sendItemAsPic(chat_id, "#weekgame", "Главная игра недели")
+                    bot.sendPool(chat_id, "Кто победит?", "Гости", "Хозяева")
+
+
+                }
+                message.contains(Regex("Released|Signed")) -> {
+                    var gif = ""
+                    when {
+                        message.contains("Released") -> gif =
+                            "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
+                        message.contains("Signed") -> gif = "https://media.giphy.com/media/KHVexxqBrUvAfjhfAg/giphy.gif"
+                    }
+                    val link = message.replaceBefore("http://", "")
+                    Selenide.open(link)
+                    var over = Selenide.element(By.cssSelector(playerOverCss)).text()
+                    if (Integer.parseInt(over.dropLast(4)) >= 74) {
+                        bot.sendAnimation(chat_id, gif, "$message \n$over")
+                    }
+                }
+                else -> {
+                    bot.sendText(chat_id, message)
+                }
+            }
+        } catch (e: Exception) {
+            bot.sendFail(chat_id, message)
+            throw e
+        } finally {
+            Selenide.closeWebDriver()
         }
 
+    }
+
+    fun getSchedules(chat_id: Long, msg: String) {
+        Configuration.browserSize = "1288x1288"
+        Selenide.open("$link/schedules")
+        bot.sendPic(
+            chat_id,
+            Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
+            msg
+        )
+    }
+
+    fun sendItemAsPic(chat_id: Long, cssSelector: String, caption: String) {
+        bot.sendPic(
+            chat_id, Selenide.element(By.cssSelector(cssSelector)).getScreenshotAs(FILE), caption
+        )
     }
 
     fun rage(chat_id: Long) {

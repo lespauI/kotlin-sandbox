@@ -43,4 +43,14 @@ class DaddyController(
         }
     }
 
+    @GetMapping("/daddyleague/schedules/{chat_id}")
+    fun schedules(@PathVariable chat_id: Long): ResponseEntity<String> {
+        try {
+            daddyProcessor.getSchedules(chat_id, "")
+            return ResponseEntity("Is Ok!", HttpStatus.OK)
+        } catch (e: Exception) {
+            return ResponseEntity(":(", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
 }
