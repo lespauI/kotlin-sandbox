@@ -5,6 +5,9 @@ import com.codeborne.selenide.Screenshots
 import com.codeborne.selenide.Selenide
 import kt.sandbox.utils.Bot
 import org.openqa.selenium.By
+import org.openqa.selenium.OutputType.FILE
+import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.remote.DesiredCapabilities
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -20,15 +23,14 @@ class DaddyProcessor @Autowired constructor(
 
     val logger = LoggerFactory.getLogger(javaClass)
 
-    var gameId: String = ""
-    val downloadBtn = ".btn.btn-primary.downloadrecap.text-white"
     val playerOverCss = ".pull-right.cfm-team-ovr"
-    var link = "http://daddyleagues.com/uflrus/"
+    val link = "http://daddyleagues.com/uflrus/"
 
-    var bot = Bot(token)
+    val bot = Bot(token)
 
     fun parseMessage(chat_id: Long, body: Map<String, String>) {
-
+        Configuration.browserSize = "1290x620"
+        Configuration.browserCapabilities.setCapability("arguments","--hide-scrollbars")
         logger.info(body.toString())
 
         var message = body.get("content").orEmpty()
@@ -39,20 +41,20 @@ class DaddyProcessor @Autowired constructor(
         when {
             message.contains("gamerecap") -> {
                 //TODO refactor
-                link = message.replaceBefore("http://", "")
-                this.gameId = message.replaceBefore("/gamerecap/", "")
-                    .replace("/gamerecap/", "")
+                val link = message.replaceBefore("http://", "")
                 logger.info("link = $link")
-                logger.info("gameId = $gameId")
+                Configuration.browserSize = "1290x620"
                 Selenide.open(link)
-                Selenide.element(By.cssSelector(downloadBtn)).click()
-                bot.sendGameRecap(chat_id, gameId, message)
+                bot.sendPic(chat_id,
+                    Selenide.element(By.cssSelector("#gamerecapdownload")).getScreenshotAs(FILE),
+                    message)
                 Selenide.closeWebDriver()
+                //bot.sendGameRecap(chat_id, gameId, message)
             }
             message.contains("advanced to week") -> {
                 try {
-                    Configuration.browserSize = "350x620"
-                    Selenide.open(link)
+                    Configuration.browserSize = "450x550"
+                    Selenide.open(this.link)
                     Selenide.element(By.cssSelector("#weekgame")).scrollTo()
                     bot.sendPic(chat_id, Screenshots.takeScreenShotAsFile(), message)
                 } catch (e: Exception) {
