@@ -53,4 +53,14 @@ class DaddyController(
         }
     }
 
+    @GetMapping("/daddyleague/weekgame/{chat_id}")
+    fun weekgame(@PathVariable chat_id: Long): ResponseEntity<String> {
+        try {
+            daddyProcessor.getGameOfTheWeek(chat_id)
+            return ResponseEntity("Is Ok!", HttpStatus.OK)
+        } catch (e: Exception) {
+            return ResponseEntity(":(", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
 }

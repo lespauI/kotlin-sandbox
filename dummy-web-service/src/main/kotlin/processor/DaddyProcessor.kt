@@ -3,6 +3,7 @@ package kt.sandbox.processor
 import com.codeborne.selenide.Configuration
 import com.codeborne.selenide.Screenshots
 import com.codeborne.selenide.Selenide
+import kt.sandbox.data.Team
 import kt.sandbox.utils.Bot
 import org.openqa.selenium.By
 import org.openqa.selenium.OutputType.FILE
@@ -66,10 +67,6 @@ class DaddyProcessor @Autowired constructor(
                             .getScreenshotAs(FILE), "Игрок защиты"
                     )
 
-                    sendItemAsPic(chat_id, "#weekgame", "Главная игра недели")
-                    bot.sendPool(chat_id, "Кто победит?", "Гости", "Хозяева")
-
-
                 }
                 message.contains(Regex("Released|Signed")) -> {
                     var gif = ""
@@ -114,8 +111,31 @@ class DaddyProcessor @Autowired constructor(
         )
     }
 
+    fun getGameOfTheWeek(chat_id: Long) {
+        Selenide.open(link)
+        Thread.sleep(2000)
+        sendItemAsPic(chat_id, "#weekgame", "Главная игра недели")
+
+        val guest: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(1)")
+            .getAttribute("style")
+            .replace(Regex("(.*)/left/(\\d+).png.*"), "$2")
+        val home: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(4)")
+            .getAttribute("style")
+            .replace(Regex("(.*)/right/(\\d+).png.*"), "$2")
+
+        bot.sendPool(chat_id, "Кто победит?", teamList[Integer.parseInt(guest)],
+            teamList[Integer.parseInt(home)])
+        Selenide.closeWebDriver()
+    }
+
     fun rage(chat_id: Long) {
         bot.sendAnimation(chat_id, "https://media.giphy.com/media/EtB1yylKGGAUg/giphy.gif", "")
-
     }
+
+    val teamList = listOf(
+        "Bears", "Bengals", "Bills", "Broncos", "Browns", "Buccaneers", "Cardinals", "Chargers", "Chiefs",
+        "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons", "49ers", "Giants", "Jaguars", "Jets", "Lions",
+        "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Redskins", "Saints", "Seahawks",
+        "Steelers", "Titans", "Vikings", "Texans"
+    )
 }
