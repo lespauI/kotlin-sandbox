@@ -51,6 +51,12 @@ class DaddyProcessor @Autowired constructor(
 
         if (!status) {
             Selenide.closeWebDriver()
+            bot.sendFail(
+                -273770462,
+                "Error for\n$message\n" +
+                        "XZ \n " +
+                        " Refresh by https://daddy-league-new-staging.herokuapp.com/daddyleague/push"
+            )
             throw UnknownError("XZ")
         }
     }
@@ -68,7 +74,7 @@ class DaddyProcessor @Autowired constructor(
                 bot.sendPic(
                     chat_id,
                     Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
-                    message
+                    "$message #score"
                 )
                 return true
             }
@@ -93,7 +99,7 @@ class DaddyProcessor @Autowired constructor(
 
                 getGameOfTheWeek(chat_id)
 
-                bot.sendText(chat_id, message)
+                bot.sendText(chat_id, "$message #шаг")
                 return true
             }
             message.contains(Regex("Released|Signed")) -> {
@@ -108,7 +114,7 @@ class DaddyProcessor @Autowired constructor(
                 Thread.sleep(6000)
                 var over = Selenide.element(By.cssSelector(playerOverCss)).text()
                 if (Integer.parseInt(over.dropLast(4)) >= 74) {
-                    bot.sendAnimation(chat_id, gif, "$message \n$over")
+                    bot.sendAnimation(chat_id, gif, "$message \n$over #transaction")
                 }
                 return true
             }
