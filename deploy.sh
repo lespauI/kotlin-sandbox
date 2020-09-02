@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mvn clean package $2
-heroku deploy:jar dummy-web-service/target/dummy-web-service.jar --app daddy-league-new$1
+heroku deploy:jar ufl-bot/target/ufl-bot.jar --app daddy-league-new$1
 
 echo "Sanity tests"
 curl -d '{"text":"\n-------Sanity Tests-------\n"}' -H "Content-Type: application/json" -X POST https://daddy-league-new$1.herokuapp.com/daddyleague/-273770462

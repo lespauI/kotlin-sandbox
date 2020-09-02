@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>dummy-web-service</module>
+        <module>ufl-bot-service</module>
+        <module>ufl-bot</module>
     </modules>
 </project>

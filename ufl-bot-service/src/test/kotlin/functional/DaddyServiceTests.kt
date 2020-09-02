@@ -1,6 +1,6 @@
 package functional
 
-import kt.sandbox.DummyServiceApplication
+import kt.sandbox.UflBotServiceApplication
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [DummyServiceApplication::class], properties = ["management.server.port=8001"])
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [UflBotServiceApplication::class], properties = ["management.server.port=8001"])
 class DaddyServiceTests(
     @Autowired
     private val restTemplate: TestRestTemplate

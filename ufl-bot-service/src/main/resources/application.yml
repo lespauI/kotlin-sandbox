@@ -1,4 +1,3 @@
-
 server:
   port: ${PORT:8080}
 
@@ -22,7 +21,7 @@ management:
           - ping
 
 info:
-  name: Dummy Service
+  name: Ufl Bot Service
   version: @project.version@
   timezone: "Europe/London"
   build:
@@ -30,5 +29,10 @@ info:
 
 token:
 
-GOOGLE_CHROME_PATH : '/app/.apt/usr/bin/google_chrome'
-CHROMEDRIVER_PATH : '/app/.chromedriver/bin/chromedriver'
+GOOGLE_CHROME_PATH: '/app/.apt/usr/bin/google_chrome'
+CHROMEDRIVER_PATH: '/app/.chromedriver/bin/chromedriver'
+
+logging:
+  file:
+    path: '/log'
+    max-history: 2

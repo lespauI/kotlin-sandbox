@@ -1,7 +1,7 @@
 package functional
 
 import com.jayway.jsonpath.JsonPath
-import kt.sandbox.DummyServiceApplication
+import kt.sandbox.UflBotServiceApplication
 import kt.sandbox.data.User
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,8 +23,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import kotlin.test.assertEquals
 
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = [DummyServiceApplication::class], properties = ["management.server.port=8001"])
-class DummyServiceApplicationTests {
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = [UflBotServiceApplication::class], properties = ["management.server.port=8001"])
+class UflBotServiceApplicationTests {
 
     @Value("\${management.server.port}")
     private val adminPort: Int? = null

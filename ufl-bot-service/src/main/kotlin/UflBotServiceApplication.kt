@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 
 
 @SpringBootApplication
-open class DummyServiceApplication
+open class UflBotServiceApplication
 
 fun main(args: Array<String>) {
-    SpringApplication.run(DummyServiceApplication::class.java, *args);
+    SpringApplication.run(UflBotServiceApplication::class.java, *args)
 }
 
 
