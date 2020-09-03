@@ -26,6 +26,7 @@ class DaddyProcessor @Autowired constructor(
 
     fun parseMessage(chat_id: Long, body: Map<String, String>) {
         Configuration.browserSize = "1290x800"
+        Configuration.headless = true
         logger.info(body.toString())
 
         var message = body.get("content").orEmpty()
