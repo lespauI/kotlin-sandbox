@@ -20,7 +20,8 @@ class DaddyProcessor @Autowired constructor(
     val logger = LoggerFactory.getLogger(javaClass)
 
     val playerOverCss = ".pull-right.cfm-team-ovr"
-    val link = "http://daddyleagues.com/uflrus"
+    //val link = "http://daddyleagues.com/uflrus" TODO return
+    val link = "http://daddyleagues.com/UGANATION"
 
     val bot = Bot(token)
 
@@ -83,7 +84,7 @@ class DaddyProcessor @Autowired constructor(
 
                 //getSchedules(chat_id, message)
 
-                clearCache()
+                //clearCache() TODO return
                 Thread.sleep(5000)
                 Selenide.open(link)
                 Thread.sleep(2000)
@@ -98,7 +99,7 @@ class DaddyProcessor @Autowired constructor(
                         .getScreenshotAs(FILE), "Игрок защиты"
                 )
 
-                getGameOfTheWeek(chat_id)
+                //getGameOfTheWeek(chat_id) TODO return
 
                 bot.sendText(chat_id, "$message #шаг")
                 return true
@@ -129,7 +130,7 @@ class DaddyProcessor @Autowired constructor(
     private fun clearCache() {
         Selenide.open("http://www.daddyleagues.com/login")
         Selenide.element("#username").sendKeys("lespaul1488")
-        Selenide.element("#password").sendKeys("ZuZkezW7")
+        Selenide.element("#password").sendKeys("demonvanal")
         Selenide.element("#loginForm > button").click()
         Selenide.open("$link/admin")
         Selenide.element(".btn.btn-info.ajax").click()

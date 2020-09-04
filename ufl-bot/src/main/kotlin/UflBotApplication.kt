@@ -1,11 +1,17 @@
+package kt.sandbox
+
 import com.elbekD.bot.Bot
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import kt.sandbox.bot.AdminController
 
 
 @SpringBootApplication
 open class UflBotApplication
 
 fun main(args: Array<String>) {
+
+    val adminController =  AdminController()
+
     val token = System.getProperty("token")
     val bot = Bot.createPolling("", token)
 
@@ -37,6 +43,7 @@ fun main(args: Array<String>) {
                     4 2 возможность редактировать
                 5) лимит не более 2 вейверов в сезон
                 6) победитель вейвера переходит в конец очереди
+                7) Если следующая по приоритету команда хотела взять игрока, который ушел, то, соответственно, ей достается второй игрок из заявки
 
          */
     }
@@ -47,7 +54,14 @@ fun main(args: Array<String>) {
             1. гет эло
             2. сет эло
             3. апдейт эло
+            4. флюш эло
+
+            все начинают с 1200 эло
         */
+    }
+
+    bot.onCommand("/serviceStatus") {msg, _->
+        bot.sendMessage(msg.chat.id, adminController.serviceStatus())
     }
 
     bot.start()
