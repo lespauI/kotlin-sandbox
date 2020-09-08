@@ -29,6 +29,10 @@ info:
 
 token:
 
+proxy:
+  url: "45.4.196.18"
+  port: 8080
+
 GOOGLE_CHROME_PATH: '/app/.apt/usr/bin/google_chrome'
 CHROMEDRIVER_PATH: '/app/.chromedriver/bin/chromedriver'
 

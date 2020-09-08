@@ -12,37 +12,34 @@ import kt.sandbox.processor.DaddyProcessor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.TaskScheduler
 import java.lang.Exception
 
 @RestController
 class DaddyController(
-    @Autowired
-    private val daddyProcessor: DaddyProcessor
+        @Autowired
+        private val daddyProcessor: DaddyProcessor
 ) {
 
     var failedList: ArrayList<Map<Long, Map<String, String>>> = arrayListOf()
+    var executionList: ArrayList<Map<Long, Map<String, String>>> = arrayListOf()
 
     val logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/daddyleague/{chat_id}")
     fun postWebHook(@RequestBody body: Map<String, String>, @PathVariable chat_id: Long): ResponseEntity<String> {
+        val map = hashMapOf<Long, Map<String, String>>()
+        map[chat_id] = body
+        executionList.add(map)
         try {
             daddyProcessor.parseMessage(chat_id, body)
+            executionList.remove(map)
             return ResponseEntity("\nIs Ok!", HttpStatus.OK)
         } catch (e: Exception) {
             closeWebDriver()
             logger.error("Exception! $e.message")
-            //try {
-            //    Thread.sleep(5000)
-            //    daddyProcessor.parseMessage(chat_id, body)
-            //    return ResponseEntity("\nIs Ok! But from 2nd time", HttpStatus.OK)
-            //} catch (e: Exception) {
-            daddyProcessor.sendDebug("chat_id = $chat_id for message = $body", e)
-            val map = hashMapOf<Long, Map<String, String>>()
-            map[chat_id] = body
             failedList.add(map)
             return ResponseEntity("\nError qwer $e.message", HttpStatus.NO_CONTENT)
-            //}
         }
     }
 
@@ -69,10 +66,13 @@ class DaddyController(
         }
     }
 
-    @GetMapping("/daddyleague/get")
-    fun get(): ResponseEntity<String> {
+    @GetMapping("/daddyleague/get/{type}")
+    fun get(@PathVariable(required = false) type: String): ResponseEntity<String> {
         try {
-            return ResponseEntity("Size = ${failedList.size}\n$failedList", HttpStatus.OK)
+            if (type.equals("failed")) {
+                return ResponseEntity("Size = ${failedList.size}\n$failedList", HttpStatus.OK)
+            } else
+                return ResponseEntity("Size = ${executionList.size}\n$executionList", HttpStatus.OK)
         } catch (e: Exception) {
             return ResponseEntity("Error $e.message\n", HttpStatus.INTERNAL_SERVER_ERROR)
         }

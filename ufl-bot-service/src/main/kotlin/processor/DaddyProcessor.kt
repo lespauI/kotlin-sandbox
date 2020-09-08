@@ -13,21 +13,41 @@ import java.lang.Exception
 
 @Component
 class DaddyProcessor @Autowired constructor(
-    @Value("\${token}")
-    val token: String
+        @Value("\${token}")
+        val token: String,
+        @Value("\${proxy.url}")
+        val proxyUrl : String,
+        @Value("\${proxy.port}")
+        val proxyPort : Int
 ) {
 
     val logger = LoggerFactory.getLogger(javaClass)
 
     val playerOverCss = ".pull-right.cfm-team-ovr"
     val link = "http://daddyleagues.com/uflrus"
-    //val link = "http://daddyleagues.com/UGANATION"
 
     val bot = Bot(token)
 
+    private var delayer = 0
+
     fun parseMessage(chat_id: Long, body: Map<String, String>) {
+        delayer++
+        //TODO add proper delay
+        if(delayer > 5) {
+            bot.sendText(chat_id, "-----Debug message----\n\texecuting delayer")
+            Thread.sleep(60000)
+            delayer = 0
+        }
+
         Configuration.browserSize = "1290x800"
         Configuration.headless = true
+
+        if(System.getProperty("proxyEnabled").equals(true)) {
+            Configuration.proxyEnabled = true
+            Configuration.proxyHost = proxyUrl
+            Configuration.proxyPort = proxyPort
+        }
+
         logger.info(body.toString())
 
         var message = body.get("content").orEmpty()
@@ -41,24 +61,13 @@ class DaddyProcessor @Autowired constructor(
             Selenide.closeWebDriver()
 
         } catch (e: Exception) {
-            bot.sendFail(
-                -273770462,
-                "Error for\n$message\n" +
-                        "$e \n " +
-                        " Refresh by https://daddy-league-new-staging.herokuapp.com/daddyleague/push"
-            )
+
             Selenide.closeWebDriver()
             throw e
-            }
+        }
 
         if (!status) {
             Selenide.closeWebDriver()
-            bot.sendFail(
-                -273770462,
-                "Error for\n$message\n" +
-                        "XZ \n " +
-                        " Refresh by https://daddy-league-new-staging.herokuapp.com/daddyleague/push"
-            )
             throw UnknownError("XZ")
         }
     }
@@ -66,6 +75,7 @@ class DaddyProcessor @Autowired constructor(
     private fun executeAction(chat_id: Long, message: String): Boolean {
         when {
             message.contains("gamerecap") -> {
+
                 //TODO refactor
                 val link = message.replaceBefore("http://", "")
                 logger.info("link = $link")
@@ -78,10 +88,10 @@ class DaddyProcessor @Autowired constructor(
                     Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
                     "$message #score"
                 )
+                //TODO delay execution
                 return true
             }
             message.contains("advanced to week") -> {
-
                 //getSchedules(chat_id, message)
 
                 clearCache()
@@ -90,12 +100,12 @@ class DaddyProcessor @Autowired constructor(
                 Thread.sleep(2000)
 
                 bot.sendPic(
-                    chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 5)
+                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 5)
                         .getScreenshotAs(FILE), "Игрок нападения"
                 )
 
                 bot.sendPic(
-                    chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 6)
+                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 6)
                         .getScreenshotAs(FILE), "Игрок защиты"
                 )
 
@@ -108,7 +118,7 @@ class DaddyProcessor @Autowired constructor(
                 var gif = ""
                 when {
                     message.contains("Released") -> gif =
-                        "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
+                            "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
                     message.contains("Signed") -> gif = "https://media.giphy.com/media/KHVexxqBrUvAfjhfAg/giphy.gif"
                 }
                 val link = message.replaceBefore("http://", "")
@@ -142,9 +152,9 @@ class DaddyProcessor @Autowired constructor(
         Configuration.browserSize = "1288x1288"
         Selenide.open("$link/schedules")
         bot.sendPic(
-            chat_id,
-            Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
-            msg
+                chat_id,
+                Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
+                msg
         )
     }
 
@@ -152,21 +162,21 @@ class DaddyProcessor @Autowired constructor(
         Selenide.open(link)
         Thread.sleep(6000)
         bot.sendPic(
-            chat_id,
-            Selenide.element(By.cssSelector("#weekgame")).getScreenshotAs(FILE),
-            "Главная игра недели"
+                chat_id,
+                Selenide.element(By.cssSelector("#weekgame")).getScreenshotAs(FILE),
+                "Главная игра недели"
         )
 
         val guest: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(1)")
-            .getAttribute("style")
-            .replace(Regex("(.*)/left/(\\d+).png.*"), "$2")
+                .getAttribute("style")
+                .replace(Regex("(.*)/left/(\\d+).png.*"), "$2")
         val home: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(4)")
-            .getAttribute("style")
-            .replace(Regex("(.*)/right/(\\d+).png.*"), "$2")
+                .getAttribute("style")
+                .replace(Regex("(.*)/right/(\\d+).png.*"), "$2")
 
         bot.sendPool(
-            chat_id, "Кто победит?", teamList[Integer.parseInt(guest)],
-            teamList[Integer.parseInt(home)]
+                chat_id, "Кто победит?", teamList[Integer.parseInt(guest)],
+                teamList[Integer.parseInt(home)]
         )
 
     }
@@ -175,21 +185,21 @@ class DaddyProcessor @Autowired constructor(
         bot.sendAnimation(chat_id, "https://media.giphy.com/media/EtB1yylKGGAUg/giphy.gif", "")
     }
 
-    fun sendDebug(msg: String, exception: java.lang.Exception) {
+/*    fun sendDebug(msg: String, exception: java.lang.Exception) {
         //bot.sendFail(-273770462, "Error for\n$msg\n$exception")
         bot.sendFail(
-            -273770462,
-            "\n$msg\n" +
-                    "\nError - \n$exception"
-                    + "\nRefresh by https://daddy-league-new-staging.herokuapp.com/daddyleague/push"
+                -273770462,
+                "\n$msg\n" +
+                        "\nError - \n$exception"
+                        + "\nRefresh by https://daddy-league-new-staging.herokuapp.com/daddyleague/push"
         )
-    }
+    }*/
 
 
     val teamList = listOf(
-        "Bears", "Bengals", "Bills", "Broncos", "Browns", "Buccaneers", "Cardinals", "Chargers", "Chiefs",
-        "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons", "49ers", "Giants", "Jaguars", "Jets", "Lions",
-        "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Redskins", "Saints", "Seahawks",
-        "Steelers", "Titans", "Vikings", "Texans"
+            "Bears", "Bengals", "Bills", "Broncos", "Browns", "Buccaneers", "Cardinals", "Chargers", "Chiefs",
+            "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons", "49ers", "Giants", "Jaguars", "Jets", "Lions",
+            "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Football Team", "Saints", "Seahawks",
+            "Steelers", "Titans", "Vikings", "Texans"
     )
 }
