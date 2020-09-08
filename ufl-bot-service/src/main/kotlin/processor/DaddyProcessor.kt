@@ -28,18 +28,9 @@ class DaddyProcessor @Autowired constructor(
 
     val bot = Bot(token)
 
-    private var delayer = 0
+    private var messages: ArrayList<String> = arrayListOf()
 
     fun parseMessage(chat_id: Long, body: Map<String, String>) {
-        delayer++
-        //TODO add proper delay
-        if(delayer > 5) {
-            bot.sendText(chat_id, "-----Debug message----\n\texecuting delayer with delay $delayer sec")
-            Thread.sleep((delayer * 1000).toLong())
-            delayer = 0
-            bot.sendText(chat_id, "-----Debug message----\n\tdelayer flush")
-        }
-
         Configuration.browserSize = "1290x800"
         Configuration.headless = true
 
@@ -57,6 +48,8 @@ class DaddyProcessor @Autowired constructor(
         logger.info("message = $message")
         var status = false
 
+        if(!messages.contains(message)){
+            messages.add(message)
         try {
             status = executeAction(chat_id, message)
             Selenide.closeWebDriver()
@@ -70,6 +63,11 @@ class DaddyProcessor @Autowired constructor(
         if (!status) {
             Selenide.closeWebDriver()
             throw UnknownError("XZ")
+        }
+        } else if (messages.size == 1000) {
+            while(messages.size == 100) {
+                messages.removeAt(0)
+            }
         }
     }
 
@@ -89,7 +87,6 @@ class DaddyProcessor @Autowired constructor(
                     Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
                     "$message #score"
                 )
-                //TODO delay execution
                 return true
             }
             message.contains("advanced to week") -> {
