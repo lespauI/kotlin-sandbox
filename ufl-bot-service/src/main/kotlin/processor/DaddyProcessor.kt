@@ -43,7 +43,7 @@ class DaddyProcessor @Autowired constructor(
         Configuration.browserSize = "1290x800"
         Configuration.headless = true
 
-        if(System.getProperty("proxyEnabled").equals(true)) {
+        if(System.getProperty("proxyEnabled", "false")!!.toBoolean()) {
             Configuration.proxyEnabled = true
             Configuration.proxyHost = proxyUrl
             Configuration.proxyPort = proxyPort

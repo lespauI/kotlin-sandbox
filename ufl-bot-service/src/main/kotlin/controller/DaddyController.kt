@@ -31,15 +31,15 @@ class DaddyController(
         val map = hashMapOf<Long, Map<String, String>>()
         map[chat_id] = body
         executionList.add(map)
-        try {
+        return try {
             daddyProcessor.parseMessage(chat_id, body)
             executionList.remove(map)
-            return ResponseEntity("\nIs Ok!", HttpStatus.OK)
+            ResponseEntity("\nIs Ok!", HttpStatus.OK)
         } catch (e: Exception) {
             closeWebDriver()
             logger.error("Exception! $e.message")
             failedList.add(map)
-            return ResponseEntity("\nError qwer $e.message", HttpStatus.NO_CONTENT)
+            ResponseEntity("\nError qwer $e.message", HttpStatus.NO_CONTENT)
         }
     }
 
