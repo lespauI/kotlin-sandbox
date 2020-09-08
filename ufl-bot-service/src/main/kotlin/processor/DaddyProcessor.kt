@@ -34,9 +34,10 @@ class DaddyProcessor @Autowired constructor(
         delayer++
         //TODO add proper delay
         if(delayer > 5) {
-            bot.sendText(chat_id, "-----Debug message----\n\texecuting delayer")
-            Thread.sleep(60000)
+            bot.sendText(chat_id, "-----Debug message----\n\texecuting delayer with delay $delayer sec")
+            Thread.sleep((delayer * 1000).toLong())
             delayer = 0
+            bot.sendText(chat_id, "-----Debug message----\n\tdelayer flush")
         }
 
         Configuration.browserSize = "1290x800"
