@@ -71,7 +71,10 @@ class DaddyController(
         try {
             if (type.equals("failed")) {
                 return ResponseEntity("Size = ${failedList.size}\n$failedList", HttpStatus.OK)
-            } else
+            } else if (type.equals("msg")) {
+                return ResponseEntity("Size = ${daddyProcessor.getMessagesList().size}\n${daddyProcessor.getMessagesList()}", HttpStatus.OK)
+            }
+            else
                 return ResponseEntity("Size = ${executionList.size}\n$executionList", HttpStatus.OK)
         } catch (e: Exception) {
             return ResponseEntity("Error $e.message\n", HttpStatus.INTERNAL_SERVER_ERROR)
