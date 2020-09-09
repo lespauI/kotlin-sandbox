@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
     val adminController =  AdminController()
 
     val token = System.getProperty("token")
-    val bot = Bot.createPolling("", token)
+    val bot = Bot.createPolling("newUflBot", token)
 
     bot.onCommand("/start") { msg, _ ->
         bot.sendMessage(msg.chat.id, "Hello World!")
