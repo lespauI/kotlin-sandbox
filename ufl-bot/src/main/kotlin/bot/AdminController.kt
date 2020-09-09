@@ -1,8 +1,7 @@
-package kt.sandbox.bot
+package Data.bot
 
 import io.restassured.RestAssured.given
 import io.restassured.builder.RequestSpecBuilder
-import io.restassured.response.Response
 import org.springframework.stereotype.Component
 
 @Component
