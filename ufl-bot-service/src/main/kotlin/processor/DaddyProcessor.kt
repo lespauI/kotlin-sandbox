@@ -68,6 +68,7 @@ class DaddyProcessor @Autowired constructor(
                 messages.removeAll(messages.subList(0 , messages.size - 30))
         } else {
             //todo
+            sendDebug(message)
         }
     }
 
@@ -187,15 +188,14 @@ class DaddyProcessor @Autowired constructor(
         return messages
     }
 
-/*    fun sendDebug(msg: String, exception: java.lang.Exception) {
-        //bot.sendFail(-273770462, "Error for\n$msg\n$exception")
+    fun sendDebug(msg: String) {
+
         bot.sendFail(
                 -273770462,
                 "\n$msg\n" +
-                        "\nError - \n$exception"
-                        + "\nRefresh by https://daddy-league-new-staging.herokuapp.com/daddyleague/push"
+                        "\nThis row is duplicated"
         )
-    }*/
+    }
 
 
     val teamList = listOf(
