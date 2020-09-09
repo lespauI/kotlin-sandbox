@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
         bot.sendMessage(msg.chat.id, "Hello World!")
     }
 
-    bot.onCommand("/set") { msg, _ ->
+   /* bot.onCommand("/set") { msg, _ ->
         bot.sendMessage(msg.chat.id, "Executing set")
         //set to database
     }
@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
     bot.onCommand("/get") { msg, _ ->
         bot.sendMessage(msg.chat.id, "Executing get")
         //get from dbase
-    }
+    }*/
 
     bot.onCommand("/waiver") { msg, _ ->
         bot.sendMessage(msg.chat.id, "Executing waiver")
@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
         */
     }
 
-    bot.onCommand("/serviceStatus") {msg, _->
+    bot.onCommand("/service") {msg, _->
         bot.sendMessage(msg.chat.id, adminController.serviceStatus())
     }
 
