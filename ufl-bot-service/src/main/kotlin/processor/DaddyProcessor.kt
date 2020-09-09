@@ -16,9 +16,9 @@ class DaddyProcessor @Autowired constructor(
         @Value("\${token}")
         val token: String,
         @Value("\${proxy.url}")
-        val proxyUrl : String,
+        val proxyUrl: String,
         @Value("\${proxy.port}")
-        val proxyPort : Int
+        val proxyPort: Int
 ) {
 
     val logger = LoggerFactory.getLogger(javaClass)
@@ -34,7 +34,7 @@ class DaddyProcessor @Autowired constructor(
         Configuration.browserSize = "1290x800"
         Configuration.headless = true
 
-        if(System.getProperty("proxyEnabled", "false")!!.toBoolean()) {
+        if (System.getProperty("proxyEnabled", "false")!!.toBoolean()) {
             Configuration.proxyEnabled = true
             Configuration.proxyHost = proxyUrl
             Configuration.proxyPort = proxyPort
@@ -48,26 +48,26 @@ class DaddyProcessor @Autowired constructor(
         logger.info("message = $message")
         var status = false
 
-        if(!messages.contains(message)){
+        if (!messages.contains(message)) {
             messages.add(message)
-        try {
-            status = executeAction(chat_id, message)
-            Selenide.closeWebDriver()
+            try {
+                status = executeAction(chat_id, message)
+                Selenide.closeWebDriver()
 
-        } catch (e: Exception) {
+            } catch (e: Exception) {
 
-            Selenide.closeWebDriver()
-            throw e
-        }
-
-        if (!status) {
-            Selenide.closeWebDriver()
-            throw UnknownError("XZ")
-        }
-        } else if (messages.size == 1000) {
-            while(messages.size == 100) {
-                messages.removeAt(0)
+                Selenide.closeWebDriver()
+                throw e
             }
+
+            if (!status) {
+                Selenide.closeWebDriver()
+                throw UnknownError("XZ")
+            }
+            if(messages.size >= 100)
+                messages.removeAll(messages.subList(0 , messages.size - 30))
+        } else {
+            //todo
         }
     }
 
@@ -83,9 +83,9 @@ class DaddyProcessor @Autowired constructor(
                 //TODO add normal wait
                 Thread.sleep(6000)
                 bot.sendPic(
-                    chat_id,
-                    Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
-                    "$message #score"
+                        chat_id,
+                        Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
+                        "$message #score"
                 )
                 return true
             }
@@ -181,6 +181,10 @@ class DaddyProcessor @Autowired constructor(
 
     fun rage(chat_id: Long) {
         bot.sendAnimation(chat_id, "https://media.giphy.com/media/EtB1yylKGGAUg/giphy.gif", "")
+    }
+
+    fun getMessagesList(): ArrayList<String> {
+        return messages
     }
 
 /*    fun sendDebug(msg: String, exception: java.lang.Exception) {
