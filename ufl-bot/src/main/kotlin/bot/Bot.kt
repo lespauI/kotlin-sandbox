@@ -65,7 +65,7 @@ open class Bot {
             dbConnector.connect()
             val dbProcessor = DbProcessor(dbConnector.getConnection()!!)
 
-            val rs = dbProcessor.executeQuery("Select name, elo from managers order by elo")
+            val rs = dbProcessor.executeQuery("Select name, elo from managers order by elo desc")
 
             val list: MutableList<String> = ArrayList<String>()
 
