@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.lang.Exception
+import java.lang.RuntimeException
 
 @Component
 class DaddyProcessor @Autowired constructor(
@@ -53,22 +54,30 @@ class DaddyProcessor @Autowired constructor(
             try {
                 status = executeAction(chat_id, message)
                 Selenide.closeWebDriver()
-
+            } catch (re: RuntimeException) {
+                var count = 0
+                while (count < 10 && !status) {
+                    Thread.sleep(30000)
+                    try {
+                        count++
+                        status = executeAction(chat_id, message)
+                    } catch (e: Exception) {}
+                }
             } catch (e: Exception) {
-
                 Selenide.closeWebDriver()
                 throw e
             }
 
             if (!status) {
                 Selenide.closeWebDriver()
+                sendDebug(message + "\n#e000 something goes wrong")
                 throw UnknownError("XZ")
             }
-            if(messages.size >= 100)
-                messages.removeAll(messages.subList(0 , messages.size - 30))
+            if (messages.size >= 100)
+                messages.removeAll(messages.subList(0, messages.size - 30))
         } else {
             //todo
-            sendDebug(message)
+            sendDebug(message + "\n#e100 Row is duplicated")
         }
     }
 
@@ -189,12 +198,7 @@ class DaddyProcessor @Autowired constructor(
     }
 
     fun sendDebug(msg: String) {
-
-        bot.sendFail(
-                -273770462,
-                "\n$msg\n" +
-                        "\nThis row is duplicated"
-        )
+        bot.sendFail(-273770462, "\n$msg\n")
     }
 
 
