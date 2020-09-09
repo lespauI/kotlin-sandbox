@@ -152,11 +152,17 @@ class DaddyProcessor @Autowired constructor(
                 Thread.sleep(6000)
 
                 if (message.contains("submitted"))
+                {
                     bot.sendPic(
-                            admin_chat_id,
+                            //admin_chat_id,
+                            chat_id,
                             Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
                             "$message #trade"
                     )
+                    bot.sendPool(
+                            chat_id, "Одобряем?", "Да", "Нет", "Даю больше!"
+                    )
+                }
                 if (message.contains("approved"))
                     bot.sendPic(
                             chat_id,
