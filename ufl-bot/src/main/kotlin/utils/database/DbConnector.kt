@@ -18,11 +18,14 @@ open class DbConnector @Autowired constructor() {
     fun connect() {
 
         try {
-            val url = "jdbc:sqlite:ufl-bot/daddyBotDB.db"
+            val url = "jdbc:sqlite:daddyBotDB.db"
             conn = DriverManager.getConnection(url)
             logger.info("Connection to SQLite has been established.")
+            println("Connected")
         } catch (e: SQLException) {
             logger.error(e.message)
+            println(e.message)
+
         }
     }
 
