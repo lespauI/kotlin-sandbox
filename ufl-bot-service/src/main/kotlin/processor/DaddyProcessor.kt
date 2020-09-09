@@ -19,7 +19,9 @@ class DaddyProcessor @Autowired constructor(
         @Value("\${proxy.url}")
         val proxyUrl: String,
         @Value("\${proxy.port}")
-        val proxyPort: Int
+        val proxyPort: Int,
+        @Value("\${admin_chat_id}")
+        val admin_chat_id: Long
 ) {
 
     val logger = LoggerFactory.getLogger(javaClass)
@@ -61,7 +63,9 @@ class DaddyProcessor @Autowired constructor(
                     try {
                         count++
                         status = executeAction(chat_id, message)
-                    } catch (e: Exception) {}
+                    } catch (e: Exception) {
+                    }
+                    Selenide.closeWebDriver()
                 }
             } catch (e: Exception) {
                 Selenide.closeWebDriver()
@@ -138,6 +142,29 @@ class DaddyProcessor @Autowired constructor(
                 }
                 return true
             }
+
+            message.contains(Regex("Trade|trade")) && !message.contains("denied") -> {
+                Configuration.browserSize = "1288x1888"
+
+                val link = message.replaceBefore("http://", "")
+                login()
+                Selenide.open(link)
+                Thread.sleep(6000)
+
+                if (message.contains("submitted"))
+                    bot.sendPic(
+                            admin_chat_id,
+                            Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
+                            "$message #trade"
+                    )
+                if (message.contains("approved"))
+                    bot.sendPic(
+                            chat_id,
+                            Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
+                            "$message #trade"
+                    )
+                return true
+            }
             else -> {
                 bot.sendText(chat_id, message)
                 return true
@@ -146,15 +173,18 @@ class DaddyProcessor @Autowired constructor(
     }
 
     private fun clearCache() {
-        Selenide.open("http://www.daddyleagues.com/login")
-        Selenide.element("#username").sendKeys("lespaul1488")
-        Selenide.element("#password").sendKeys("demonvanal")
-        Selenide.element("#loginForm > button").click()
+        login()
         Selenide.open("$link/admin")
         Selenide.element(".btn.btn-info.ajax").click()
         Selenide.closeWebDriver()
     }
 
+    private fun login() {
+        Selenide.open("http://www.daddyleagues.com/login")
+        Selenide.element("#username").sendKeys("lespaul1488")
+        Selenide.element("#password").sendKeys("demonvanal")
+        Selenide.element("#loginForm > button").click()
+    }
 
     fun getSchedules(chat_id: Long, msg: String) {
         Configuration.browserSize = "1288x1288"

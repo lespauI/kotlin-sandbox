@@ -40,3 +40,5 @@ logging:
   file:
     path: '/log'
     max-history: 2
+
+admin_chat_id: "-273770462"
