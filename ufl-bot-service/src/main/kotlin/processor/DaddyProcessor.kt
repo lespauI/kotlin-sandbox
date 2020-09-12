@@ -170,11 +170,11 @@ class DaddyProcessor @Autowired constructor(
                         Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
                         "$message #trade"
                     )
-                    bot.sendPool(
-                         -1001275286257,
-                        //-273770462,
-                        "Одобряем?", "Да", "Нет", "Дал бы больше!"
-                    )
+                    //bot.sendPool(
+                    //     -1001275286257,
+                    //    //-273770462,
+                    //    "Одобряем?", "Да", "Нет", "Дал бы больше!"
+                    //)
                 }
                 return true
             }

@@ -1,6 +1,8 @@
 package Data.bot
 
 import com.elbekD.bot.Bot
+import com.elbekD.bot.types.InlineKeyboardButton
+import com.elbekD.bot.types.InlineKeyboardMarkup
 import kt.sandbox.data.Elo
 import kt.sandbox.utils.database.DbConnector
 import kt.sandbox.utils.database.DbProcessor
@@ -73,10 +75,12 @@ open class Bot {
                 list.add(Elo(rs.getInt("elo"), rs.getString("name")).toString())
             }
 
-            bot.sendMessage(msg.chat.id, list.toString()
-                    .replace(",","")
-                    .replace("[","")
-                    .replace("]",""))
+            bot.sendMessage(
+                msg.chat.id, list.toString()
+                    .replace(",", "")
+                    .replace("[", "")
+                    .replace("]", "")
+            )
 
 
         }
@@ -99,8 +103,7 @@ open class Bot {
 
         }
 
-        bot.onCommand("/db_execute") {
-            msg, _->
+        bot.onCommand("/db_execute") { msg, _ ->
             dbConnector.connect()
             val dbProcessor = DbProcessor(dbConnector.getConnection()!!)
 
@@ -109,6 +112,58 @@ open class Bot {
             val teamsRS = dbProcessor.executeQuery(query.toString())
 
             println(teamsRS?.getString(2))
+        }
+
+        bot.onCallbackQuery("like") {
+            var like = Integer.parseInt(
+                it.message!!.reply_markup!!.inline_keyboard[0][0].text.split(" ")[1]
+            )
+            like += 1
+            bot.editMessageReplyMarkup(
+                chatId = it.message?.chat?.id, messageId = it.message?.message_id, markup = InlineKeyboardMarkup(
+                    listOf(
+                        listOf(
+                            InlineKeyboardButton("👍 $like", callback_data = "like"),
+                            it.message!!.reply_markup!!.inline_keyboard[0][1],
+                            it.message!!.reply_markup!!.inline_keyboard[0][2]
+                        )
+                    )
+                )
+            )
+        }
+        bot.onCallbackQuery("dislike") {
+            var like = Integer.parseInt(
+                it.message!!.reply_markup!!.inline_keyboard[0][1].text.split(" ")[1]
+            )
+            like += 1
+            bot.editMessageReplyMarkup(
+                chatId = it.message?.chat?.id, messageId = it.message?.message_id, markup = InlineKeyboardMarkup(
+                    listOf(
+                        listOf(
+                            it.message!!.reply_markup!!.inline_keyboard[0][0],
+                            InlineKeyboardButton("👎 $like", callback_data = "dislike"),
+                            it.message!!.reply_markup!!.inline_keyboard[0][2]
+                        )
+                    )
+                )
+            )
+        }
+        bot.onCallbackQuery("bue") {
+            var like = Integer.parseInt(
+                it.message!!.reply_markup!!.inline_keyboard[0][2].text.split(" ")[1]
+            )
+            like += 1
+            bot.editMessageReplyMarkup(
+                chatId = it.message?.chat?.id, messageId = it.message?.message_id, markup = InlineKeyboardMarkup(
+                    listOf(
+                        listOf(
+                            it.message!!.reply_markup!!.inline_keyboard[0][0],
+                            it.message!!.reply_markup!!.inline_keyboard[0][1],
+                            InlineKeyboardButton("🤢 $like", callback_data = "bue")
+                        )
+                    )
+                )
+            )
         }
 
         bot.start()

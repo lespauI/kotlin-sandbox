@@ -1,6 +1,9 @@
 package kt.sandbox.utils
 
 import com.pengrad.telegrambot.TelegramBot
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup
 import com.pengrad.telegrambot.request.SendAnimation
 import com.pengrad.telegrambot.request.SendMessage
 import com.pengrad.telegrambot.request.SendPhoto
@@ -34,7 +37,14 @@ class Bot(token: String?) {
     }
 
     fun sendPic(chat_id: Long, file: File, caption: String) {
-        bot.execute(SendPhoto(chat_id, file).caption(caption))
+        var mrk = InlineKeyboardMarkup(
+            arrayOf(
+                InlineKeyboardButton("👍 0").callbackData("like"),
+                InlineKeyboardButton("👎 0").callbackData("dislike"),
+                InlineKeyboardButton("🤢 0").callbackData("bue")
+            )
+        )
+        bot.execute(SendPhoto(chat_id, file).caption(caption).replyMarkup(mrk))
     }
 
     fun sendPool(chat_id: Long, question: String, vararg options: String) {
