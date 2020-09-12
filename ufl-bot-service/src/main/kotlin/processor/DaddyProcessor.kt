@@ -165,14 +165,15 @@ class DaddyProcessor @Autowired constructor(
                     Selenide.open(link)
                     Thread.sleep(6000)
                     bot.sendPic(
-                        //-1001275286257,
                         -1001275286257,
+                        //-273770462,
                         Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
                         "$message #trade"
                     )
                     bot.sendPool(
-                        // -1001275286257,
-                        -1001275286257, "Одобряем?", "Да", "Нет", "Дал бы больше!"
+                         -1001275286257,
+                        //-273770462,
+                        "Одобряем?", "Да", "Нет", "Дал бы больше!"
                     )
                 }
                 return true
@@ -192,10 +193,17 @@ class DaddyProcessor @Autowired constructor(
     }
 
     private fun login() {
-        Selenide.open("http://www.daddyleagues.com/login")
-        Selenide.element("#username").sendKeys("lespaul1488")
-        Selenide.element("#password").sendKeys("demonvanal")
-        Selenide.element("#loginForm > button").click()
+        try {
+            Selenide.open("http://www.daddyleagues.com/login")
+            Selenide.element("#username").sendKeys("lespaul1488")
+            Selenide.element("#password").sendKeys("demonvanal")
+            Selenide.element("#loginForm > button").click()
+        } catch (re: RuntimeException) {
+            throw re
+        }
+        catch (e: NoSuchElementException) {
+            println("kjhkhjkjh")
+        }
     }
 
     fun getSchedules(chat_id: Long, msg: String) {
