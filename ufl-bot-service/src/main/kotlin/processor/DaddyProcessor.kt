@@ -14,14 +14,14 @@ import java.lang.RuntimeException
 
 @Component
 class DaddyProcessor @Autowired constructor(
-        @Value("\${token}")
-        val token: String,
-        @Value("\${proxy.url}")
-        val proxyUrl: String,
-        @Value("\${proxy.port}")
-        val proxyPort: Int,
-        @Value("\${admin_chat_id}")
-        val admin_chat_id: Long
+    @Value("\${token}")
+    val token: String,
+    @Value("\${proxy.url}")
+    val proxyUrl: String,
+    @Value("\${proxy.port}")
+    val proxyPort: Int,
+    @Value("\${admin_chat_id}")
+    val admin_chat_id: Long
 ) {
 
     val logger = LoggerFactory.getLogger(javaClass)
@@ -97,9 +97,9 @@ class DaddyProcessor @Autowired constructor(
                 //TODO add normal wait
                 Thread.sleep(6000)
                 bot.sendPic(
-                        chat_id,
-                        Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
-                        "$message #score"
+                    chat_id,
+                    Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
+                    "$message #score"
                 )
                 return true
             }
@@ -112,12 +112,12 @@ class DaddyProcessor @Autowired constructor(
                 Thread.sleep(2000)
 
                 bot.sendPic(
-                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 5)
+                    chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 5)
                         .getScreenshotAs(FILE), "Игрок нападения"
                 )
 
                 bot.sendPic(
-                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 6)
+                    chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 6)
                         .getScreenshotAs(FILE), "Игрок защиты"
                 )
 
@@ -130,7 +130,7 @@ class DaddyProcessor @Autowired constructor(
                 var gif = ""
                 when {
                     message.contains("Released") -> gif =
-                            "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
+                        "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
                     message.contains("Signed") -> gif = "https://media.giphy.com/media/KHVexxqBrUvAfjhfAg/giphy.gif"
                 }
                 val link = message.replaceBefore("http://", "")
@@ -143,14 +143,10 @@ class DaddyProcessor @Autowired constructor(
                 return true
             }
 
-            message.contains(Regex("approved|denied|submitted")) -> {
-bot.sendText(-273770462, message + " #debug")                
-Configuration.browserSize = "1288x1888"
-
+            message.toLowerCase().contains("trade") -> {
                 val link = message.replaceBefore("http://", "")
-                
-                if (message.contains("submitted"))
-                {
+
+                if (message.contains("submitted")) {
 /*
                     bot.sendPic(
                             //admin_chat_id,
@@ -164,19 +160,19 @@ Configuration.browserSize = "1288x1888"
 */
                 }
                 if (message.contains("approved")) {
-bot.sendText(-273770462, message + " #debug")		  
-login()
-                  Selenide.open(link)
-                  Thread.sleep(6000)                    
-		  bot.sendPic(
-                            //-1001275286257,
--273770462,                            
-Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
-                            "$message #trade"
+                    login()
+                    Configuration.browserSize = "1288x1888"
+                    Selenide.open(link)
+                    Thread.sleep(6000)
+                    bot.sendPic(
+                        //-1001275286257,
+                        -1001275286257,
+                        Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
+                        "$message #trade"
                     )
-                   bot.sendPool(
-                           // -1001275286257, 
--273770462, "Одобряем?", "Да", "Нет", "Дал бы больше!"
+                    bot.sendPool(
+                        // -1001275286257,
+                        -1001275286257, "Одобряем?", "Да", "Нет", "Дал бы больше!"
                     )
                 }
                 return true
@@ -206,9 +202,9 @@ Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
         Configuration.browserSize = "1288x1288"
         Selenide.open("$link/schedules")
         bot.sendPic(
-                chat_id,
-                Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
-                msg
+            chat_id,
+            Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
+            msg
         )
     }
 
@@ -216,21 +212,21 @@ Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
         Selenide.open(link)
         Thread.sleep(6000)
         bot.sendPic(
-                chat_id,
-                Selenide.element(By.cssSelector("#weekgame")).getScreenshotAs(FILE),
-                "Главная игра недели"
+            chat_id,
+            Selenide.element(By.cssSelector("#weekgame")).getScreenshotAs(FILE),
+            "Главная игра недели"
         )
 
         val guest: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(1)")
-                .getAttribute("style")
-                .replace(Regex("(.*)/left/(\\d+).png.*"), "$2")
+            .getAttribute("style")
+            .replace(Regex("(.*)/left/(\\d+).png.*"), "$2")
         val home: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(4)")
-                .getAttribute("style")
-                .replace(Regex("(.*)/right/(\\d+).png.*"), "$2")
+            .getAttribute("style")
+            .replace(Regex("(.*)/right/(\\d+).png.*"), "$2")
 
         bot.sendPool(
-                chat_id, "Кто победит?", teamList[Integer.parseInt(guest)],
-                teamList[Integer.parseInt(home)]
+            chat_id, "Кто победит?", teamList[Integer.parseInt(guest)],
+            teamList[Integer.parseInt(home)]
         )
 
     }
@@ -249,9 +245,9 @@ Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
 
 
     val teamList = listOf(
-            "Bears", "Bengals", "Bills", "Broncos", "Browns", "Buccaneers", "Cardinals", "Chargers", "Chiefs",
-            "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons", "49ers", "Giants", "Jaguars", "Jets", "Lions",
-            "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Football Team", "Saints", "Seahawks",
-            "Steelers", "Titans", "Vikings", "Texans"
+        "Bears", "Bengals", "Bills", "Broncos", "Browns", "Buccaneers", "Cardinals", "Chargers", "Chiefs",
+        "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons", "49ers", "Giants", "Jaguars", "Jets", "Lions",
+        "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Football Team", "Saints", "Seahawks",
+        "Steelers", "Titans", "Vikings", "Texans"
     )
 }
