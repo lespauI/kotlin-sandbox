@@ -143,16 +143,15 @@ class DaddyProcessor @Autowired constructor(
                 return true
             }
 
-            message.contains(Regex("Trade|trade")) && !message.contains("denied") -> {
-                Configuration.browserSize = "1288x1888"
+            message.contains(Regex("approved|denied|submitted")) -> {
+bot.sendText(-273770462, message + " #debug")                
+Configuration.browserSize = "1288x1888"
 
                 val link = message.replaceBefore("http://", "")
-                login()
-                Selenide.open(link)
-                Thread.sleep(6000)
-
+                
                 if (message.contains("submitted"))
                 {
+/*
                     bot.sendPic(
                             //admin_chat_id,
                             chat_id,
@@ -162,17 +161,28 @@ class DaddyProcessor @Autowired constructor(
                     bot.sendPool(
                             chat_id, "Одобряем?", "Да", "Нет", "Даю больше!"
                     )
+*/
                 }
-                if (message.contains("approved"))
-                    bot.sendPic(
-                            chat_id,
-                            Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
+                if (message.contains("approved")) {
+bot.sendText(-273770462, message + " #debug")		  
+login()
+                  Selenide.open(link)
+                  Thread.sleep(6000)                    
+		  bot.sendPic(
+                            //-1001275286257,
+-273770462,                            
+Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
                             "$message #trade"
                     )
+                   bot.sendPool(
+                           // -1001275286257, 
+-273770462, "Одобряем?", "Да", "Нет", "Дал бы больше!"
+                    )
+                }
                 return true
             }
             else -> {
-                bot.sendText(chat_id, message)
+                bot.sendText(-273770462, message)
                 return true
             }
         }
