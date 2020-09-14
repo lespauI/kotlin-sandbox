@@ -3,6 +3,7 @@ package kt.sandbox.utils
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup
+import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup
 import com.pengrad.telegrambot.request.SendAnimation
 import com.pengrad.telegrambot.request.SendMessage
@@ -29,7 +30,7 @@ class Bot(token: String?) {
     }
 
     fun sendText(chat_id: Long, message: String) {
-        bot.execute(SendMessage(chat_id, message).disableWebPagePreview(true))
+        bot.execute(SendMessage(chat_id, message).disableWebPagePreview(true).parseMode(ParseMode.Markdown))
     }
 
     fun sendAnimation(chat_id: Long, animation_url: String, caption: String) {
