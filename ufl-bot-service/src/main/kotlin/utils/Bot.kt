@@ -29,7 +29,7 @@ class Bot(token: String?) {
     }
 
     fun sendText(chat_id: Long, message: String) {
-        bot.execute(SendMessage(chat_id, message))
+        bot.execute(SendMessage(chat_id, message).disableWebPagePreview(true))
     }
 
     fun sendAnimation(chat_id: Long, animation_url: String, caption: String) {

@@ -178,6 +178,11 @@ class DaddyProcessor @Autowired constructor(
                 }
                 return true
             }
+
+            message.contains("#трейдблок") -> {
+                bot.sendText(chat_id, message)
+                return true
+            }
             else -> {
                 bot.sendText(-273770462, message)
                 return true
