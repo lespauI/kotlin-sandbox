@@ -2,6 +2,7 @@ package kt.sandbox.processor
 
 import com.codeborne.selenide.Configuration
 import com.codeborne.selenide.Selenide
+import kt.sandbox.data.TradeBlock
 import kt.sandbox.utils.Bot
 import org.openqa.selenium.By
 import org.openqa.selenium.OutputType.FILE
@@ -14,14 +15,14 @@ import java.lang.RuntimeException
 
 @Component
 class DaddyProcessor @Autowired constructor(
-    @Value("\${token}")
-    val token: String,
-    @Value("\${proxy.url}")
-    val proxyUrl: String,
-    @Value("\${proxy.port}")
-    val proxyPort: Int,
-    @Value("\${admin_chat_id}")
-    val admin_chat_id: Long
+        @Value("\${token}")
+        val token: String,
+        @Value("\${proxy.url}")
+        val proxyUrl: String,
+        @Value("\${proxy.port}")
+        val proxyPort: Int,
+        @Value("\${admin_chat_id}")
+        val admin_chat_id: Long
 ) {
 
     val logger = LoggerFactory.getLogger(javaClass)
@@ -45,13 +46,15 @@ class DaddyProcessor @Autowired constructor(
 
         logger.info(body.toString())
 
-        var message = body.get("content").orEmpty()
+        var message = body["content"].orEmpty()
         if (message == "")
-            message = body.get("text").orEmpty()
+            message = body["text"].orEmpty()
         logger.info("message = $message")
         var status = false
 
-        if (!messages.contains(message)) {
+        if (body["type"].equals("tradeblock")) {
+            executeTradeBlock(chat_id, body)
+        } else if (!messages.contains(message)) {
             messages.add(message)
             try {
                 status = executeAction(chat_id, message)
@@ -97,9 +100,9 @@ class DaddyProcessor @Autowired constructor(
                 //TODO add normal wait
                 Thread.sleep(6000)
                 bot.sendPic(
-                    chat_id,
-                    Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
-                    "$message #score"
+                        chat_id,
+                        Selenide.element(By.cssSelector("#gamesummary")).getScreenshotAs(FILE),
+                        "$message #score"
                 )
                 return true
             }
@@ -112,12 +115,12 @@ class DaddyProcessor @Autowired constructor(
                 Thread.sleep(2000)
 
                 bot.sendPic(
-                    chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 5)
+                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 5)
                         .getScreenshotAs(FILE), "Игрок нападения"
                 )
 
                 bot.sendPic(
-                    chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 6)
+                        chat_id, Selenide.element(By.cssSelector(".card-body.p-0"), 6)
                         .getScreenshotAs(FILE), "Игрок защиты"
                 )
 
@@ -130,7 +133,7 @@ class DaddyProcessor @Autowired constructor(
                 var gif = ""
                 when {
                     message.contains("Released") -> gif =
-                        "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
+                            "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
                     message.contains("Signed") -> gif = "https://media.giphy.com/media/KHVexxqBrUvAfjhfAg/giphy.gif"
                 }
                 val link = message.replaceBefore("http://", "")
@@ -165,10 +168,10 @@ class DaddyProcessor @Autowired constructor(
                     Selenide.open(link)
                     Thread.sleep(6000)
                     bot.sendPic(
-                        -1001275286257,
-                        //-273770462,
-                        Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
-                        "$message #trade"
+                            -1001275286257,
+                            //-273770462,
+                            Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
+                            "$message #trade"
                     )
                     //bot.sendPool(
                     //     -1001275286257,
@@ -179,16 +182,43 @@ class DaddyProcessor @Autowired constructor(
                 return true
             }
 
-            message.contains("#трейдблок") -> {
-                bot.sendText(chat_id, message)
-                return true
-            }
             else -> {
                 bot.sendText(-273770462, message)
                 return true
             }
         }
     }
+
+    private fun executeTradeBlock(chat_id: Long, body: Map<String, String>): Boolean {
+
+        val tradeObj = TradeBlock(body.getOrDefault("text", ""),
+                body.getOrDefault("player", ""),
+                body.getOrDefault("team", ""),
+                body.getOrDefault("age", ""),
+                body.getOrDefault("ovr", ""),
+                body.getOrDefault("price", ""),
+                body.getOrDefault("pick", ""),
+                body.getOrDefault("dev", ""),
+                body.getOrDefault("link", ""),
+                body.getOrDefault("pos", "")
+        )
+        var msg = ""
+        if (tradeObj.player.isNotEmpty()) {
+            msg = "*${tradeObj.team}:* #${tradeObj.pos}, [${tradeObj.player}](${tradeObj.link}) ${tradeObj.ovr} OVR\n" +
+                    "*Age:* ${tradeObj.age}\n" +
+                    "*Dev. Trait:* #${tradeObj.dev}\n" +
+                    "*Needs:* ${tradeObj.price}\n" +
+                    "#трейдблок"
+        }
+        if (tradeObj.pick.isNotEmpty()) {
+            msg = "*${tradeObj.team}:* `${tradeObj.pick}`\n" +
+                    "*Needs:* ${tradeObj.price}\n" +
+                    "#пики"
+        }
+        bot.sendText(chat_id, "$msg #${tradeObj.team}")
+        return true
+    }
+
 
     private fun clearCache() {
         login()
@@ -205,8 +235,7 @@ class DaddyProcessor @Autowired constructor(
             Selenide.element("#loginForm > button").click()
         } catch (re: RuntimeException) {
             throw re
-        }
-        catch (e: NoSuchElementException) {
+        } catch (e: NoSuchElementException) {
             println("kjhkhjkjh")
         }
     }
@@ -215,9 +244,9 @@ class DaddyProcessor @Autowired constructor(
         Configuration.browserSize = "1288x1288"
         Selenide.open("$link/schedules")
         bot.sendPic(
-            chat_id,
-            Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
-            msg
+                chat_id,
+                Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
+                msg
         )
     }
 
@@ -225,21 +254,21 @@ class DaddyProcessor @Autowired constructor(
         Selenide.open(link)
         Thread.sleep(6000)
         bot.sendPic(
-            chat_id,
-            Selenide.element(By.cssSelector("#weekgame")).getScreenshotAs(FILE),
-            "Главная игра недели"
+                chat_id,
+                Selenide.element(By.cssSelector("#weekgame")).getScreenshotAs(FILE),
+                "Главная игра недели"
         )
 
         val guest: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(1)")
-            .getAttribute("style")
-            .replace(Regex("(.*)/left/(\\d+).png.*"), "$2")
+                .getAttribute("style")
+                .replace(Regex("(.*)/left/(\\d+).png.*"), "$2")
         val home: String = Selenide.element(".gameoftheweek > .row.row-flush > div:nth-child(4)")
-            .getAttribute("style")
-            .replace(Regex("(.*)/right/(\\d+).png.*"), "$2")
+                .getAttribute("style")
+                .replace(Regex("(.*)/right/(\\d+).png.*"), "$2")
 
         bot.sendPool(
-            chat_id, "Кто победит?", teamList[Integer.parseInt(guest)],
-            teamList[Integer.parseInt(home)]
+                chat_id, "Кто победит?", teamList[Integer.parseInt(guest)],
+                teamList[Integer.parseInt(home)]
         )
 
     }
@@ -258,9 +287,9 @@ class DaddyProcessor @Autowired constructor(
 
 
     val teamList = listOf(
-        "Bears", "Bengals", "Bills", "Broncos", "Browns", "Buccaneers", "Cardinals", "Chargers", "Chiefs",
-        "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons", "49ers", "Giants", "Jaguars", "Jets", "Lions",
-        "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Football Team", "Saints", "Seahawks",
-        "Steelers", "Titans", "Vikings", "Texans"
+            "Bears", "Bengals", "Bills", "Broncos", "Browns", "Buccaneers", "Cardinals", "Chargers", "Chiefs",
+            "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons", "49ers", "Giants", "Jaguars", "Jets", "Lions",
+            "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Football Team", "Saints", "Seahawks",
+            "Steelers", "Titans", "Vikings", "Texans"
     )
 }
