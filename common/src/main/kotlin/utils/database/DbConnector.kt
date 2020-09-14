@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.sql.Connection
 import java.sql.DriverManager
+import java.sql.ResultSet
 import java.sql.SQLException
 
 @Component
@@ -39,6 +40,26 @@ open class DbConnector @Autowired constructor() {
 
     fun getConnection(): Connection? {
         return conn
+    }
+
+    fun getQueryResult(query:String): ResultSet? {
+        return try {
+            var stmt = conn!!.createStatement()
+            var rs = stmt.executeQuery(query)
+            rs
+        } catch (ex: SQLException) {
+            logger.error(ex.message)
+            null
+        }
+    }
+
+    fun executeQuery(query:String) {
+         try {
+           conn!!.createStatement().executeQuery(query)
+        } catch (ex: SQLException) {
+            logger.error(ex.message)
+
+        }
     }
 
 }

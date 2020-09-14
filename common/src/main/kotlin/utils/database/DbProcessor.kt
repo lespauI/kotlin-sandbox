@@ -9,10 +9,6 @@ class DbProcessor @Autowired constructor( val conn : Connection) {
     var stmt = null
 
 
-    fun executeQuery(query:String): ResultSet? {
-        var stmt = conn.createStatement()
-        var rs = stmt.executeQuery(query)
-        return rs
-    }
+
 
 }

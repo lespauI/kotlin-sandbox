@@ -1,4 +1,4 @@
-package Data.bot
+package data.bot
 
 import io.restassured.RestAssured.given
 import io.restassured.builder.RequestSpecBuilder

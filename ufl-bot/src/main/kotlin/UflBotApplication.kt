@@ -9,6 +9,6 @@ open class UflBotApplication(
 
 fun main(args: Array<String>) {
 
-    Data.bot.Bot().start()
+    data.bot.Bot().start()
 
 }

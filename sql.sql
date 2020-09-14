@@ -3,7 +3,7 @@ CREATE TABLE if not EXISTS teams (
     id INTEGER PRIMARY KEY,
     name varchar(255),
     fullName varchar(255),
-    managerId
+    managerId int
 );
 
 CREATE TABLE if not EXISTS managers (
@@ -12,17 +12,30 @@ CREATE TABLE if not EXISTS managers (
     elo int DEFAULT 1200,
     teamId int,
     strikes int DEFAULT 0
+    w_limit int DEFAULT 2
+);
+
+CREATE TABLE if not EXISTS waiver (
+    id INTEGER PRIMARY KEY,
+    text varchar(255)
+);
+
+CREATE TABLE if not EXISTS w_request (
+    id INTEGER PRIMARY KEY,
+    waiverId int,
+    priority int,
+    managerId int
 );
 
 INSERT into managers (name, elo)
 VALUES
-("@Riverside1984",1200),
+("@Riverside1984",500),
 ("@CaptPetrenko",1200),
 ("@Nautilus90",1200),
 ("@Zheyda",1200),
 ("@SviatL",1200),
 ("@haykosar",1200),
-("@MarcusHoper",1200),
+("@MarcusHoper",500),
 ("@maga_rs",1200),
 ("@Petrenko_AV1",1200),
 ("@welldoneson",1200),
@@ -40,7 +53,7 @@ VALUES
 ("@shchastye",1200),
 ("@DimmiDi",1200),
 ("@PauloDi",1200),
-("@lespaul88",1200),
+("@lespaul88",100),
 ("@drewmeng",1200),
 ("@Archi059",1200),
 ("@JesterSV",1200),
