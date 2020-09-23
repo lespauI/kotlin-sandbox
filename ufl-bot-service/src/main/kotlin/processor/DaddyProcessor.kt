@@ -2,6 +2,7 @@ package kt.sandbox.processor
 
 import com.codeborne.selenide.Configuration
 import com.codeborne.selenide.Selenide
+import kt.sandbox.data.TradeBlock
 import kt.sandbox.utils.Bot
 import org.openqa.selenium.By
 import org.openqa.selenium.OutputType.FILE
@@ -45,13 +46,15 @@ class DaddyProcessor @Autowired constructor(
 
         logger.info(body.toString())
 
-        var message = body.get("content").orEmpty()
+        var message = body["content"].orEmpty()
         if (message == "")
-            message = body.get("text").orEmpty()
+            message = body["text"].orEmpty()
         logger.info("message = $message")
         var status = false
 
-        if (!messages.contains(message)) {
+        if (body["type"].equals("tradeblock")) {
+            executeTradeBlock(chat_id, body)
+        } else if (!messages.contains(message)) {
             messages.add(message)
             try {
                 status = executeAction(chat_id, message)
@@ -143,16 +146,11 @@ class DaddyProcessor @Autowired constructor(
                 return true
             }
 
-            message.contains(Regex("Trade|trade")) && !message.contains("denied") -> {
-                Configuration.browserSize = "1288x1888"
-
+            message.toLowerCase().contains("trade") -> {
                 val link = message.replaceBefore("http://", "")
-                login()
-                Selenide.open(link)
-                Thread.sleep(6000)
 
-                if (message.contains("submitted"))
-                {
+                if (message.contains("submitted")) {
+/*
                     bot.sendPic(
                             //admin_chat_id,
                             chat_id,
@@ -162,21 +160,65 @@ class DaddyProcessor @Autowired constructor(
                     bot.sendPool(
                             chat_id, "Одобряем?", "Да", "Нет", "Даю больше!"
                     )
+*/
                 }
-                if (message.contains("approved"))
+                if (message.contains("approved")) {
+                    login()
+                    Configuration.browserSize = "1288x1888"
+                    Selenide.open(link)
+                    Thread.sleep(6000)
                     bot.sendPic(
-                            chat_id,
+                            -1001275286257,
+                            //-273770462,
                             Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
                             "$message #trade"
                     )
+                    //bot.sendPool(
+                    //     -1001275286257,
+                    //    //-273770462,
+                    //    "Одобряем?", "Да", "Нет", "Дал бы больше!"
+                    //)
+                }
                 return true
             }
+
             else -> {
-                bot.sendText(chat_id, message)
+                bot.sendText(-273770462, message)
                 return true
             }
         }
     }
+
+    private fun executeTradeBlock(chat_id: Long, body: Map<String, String>): Boolean {
+
+        val tradeObj = TradeBlock(body.getOrDefault("text", ""),
+                body.getOrDefault("player", ""),
+                body.getOrDefault("team", ""),
+                body.getOrDefault("age", ""),
+                body.getOrDefault("ovr", ""),
+                body.getOrDefault("price", ""),
+                body.getOrDefault("pick", ""),
+                body.getOrDefault("dev", ""),
+                body.getOrDefault("link", ""),
+                body.getOrDefault("pos", "")
+        )
+        var msg = ""
+        if (tradeObj.player.isNotEmpty()) {
+            msg = "*${tradeObj.team}:* #${tradeObj.pos}, [${tradeObj.player}](${tradeObj.link}) ${tradeObj.ovr} OVR\n" +
+                    "*Age:* ${tradeObj.age}\n" +
+                    "*Dev. Trait:* #${tradeObj.dev}\n" +
+                    "*Needs:* ${tradeObj.price}\n" +
+                    "#трейдблок"
+        }
+        if (tradeObj.pick.isNotEmpty()) {
+            msg = "*${tradeObj.team}:* `${tradeObj.pick}`\n" +
+                    "*Needs:* ${tradeObj.price}\n" +
+                    "#пики"
+        }
+        bot.sendText(chat_id, "$msg #${tradeObj.team}")
+        return true
+    }
+
 
     private fun clearCache() {
         login()
@@ -186,10 +228,16 @@ class DaddyProcessor @Autowired constructor(
     }
 
     private fun login() {
-        Selenide.open("http://www.daddyleagues.com/login")
-        Selenide.element("#username").sendKeys("lespaul1488")
-        Selenide.element("#password").sendKeys("demonvanal")
-        Selenide.element("#loginForm > button").click()
+        try {
+            Selenide.open("http://www.daddyleagues.com/login")
+            Selenide.element("#username").sendKeys("lespaul1488")
+            Selenide.element("#password").sendKeys("demonvanal")
+            Selenide.element("#loginForm > button").click()
+        } catch (re: RuntimeException) {
+            throw re
+        } catch (e: NoSuchElementException) {
+            println("kjhkhjkjh")
+        }
     }
 
     fun getSchedules(chat_id: Long, msg: String) {
