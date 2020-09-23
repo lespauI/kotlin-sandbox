@@ -43,10 +43,10 @@ open class Bot {
          //get from dbase
      }*/
 
-        bot.onCommand("/waiver")
+/*        bot.onCommand("/waiver")
         { msg, _ ->
             bot.sendMessage(msg.chat.id, "Executing waiver")
-            /* methods for waiver logic
+            *//* methods for waiver logic
 
             Объявляется вейвер со списком игроков
                 1) возможность добавить список
@@ -60,8 +60,8 @@ open class Bot {
                 6) победитель вейвера переходит в конец очереди
                 7) Если следующая по приоритету команда хотела взять игрока, который ушел, то, соответственно, ей достается второй игрок из заявки
 
-         */
-        }
+         *//*
+        }*/
 
         /*
         bot.chain("/start") { msg -> bot.sendMessage(msg.chat.id, "Hi! What is your name?") }
@@ -70,6 +70,7 @@ open class Bot {
         .build()
          */
 
+/*
         bot.chain("/waiver_list") { msg ->
             db.connect()
 
@@ -94,8 +95,9 @@ open class Bot {
 
             db.close()
         }.build()
+*/
 
-        bot.chain("/waiver_add")
+       /* bot.chain("/waiver_add")
         { msg ->
             bot.sendMessage(msg.chat.id, "Давай сюда игрока RB - Иван Иванов - 85 ovr (можно списком)")
         }.then { msg ->
@@ -114,18 +116,18 @@ open class Bot {
                 "Нет", "нет" -> bot.sendMessage(msg.chat.id, "Давай заново")
                 else -> bot.sendMessage(msg.chat.id, "Oops, I don't understand you. Just answer yes or no?")
             }
-        }.build()
+        }.build()*/
 
-        bot.onCommand("/elo")
+       /* bot.onCommand("/elo")
         { msg, _ ->
-            /* methods for waiver logic
+            *//* methods for waiver logic
                   1. гет эло
                   2. сет эло
                   3. апдейт эло
                   4. флюш эло
 
                   все начинают с 1200 эло
-              */
+              *//*
             db.connect()
             val dbProcessor = DbProcessor(db.getConnection()!!)
 
@@ -141,14 +143,8 @@ open class Bot {
 
             db.close()
 
-        }
-
-        bot.onCommand("/service")
-        { msg, _ ->
-            bot.sendMessage(msg.chat.id, adminController.serviceStatus())
-        }
-
-        bot.onCommand("/debug")
+        }*/
+/*        bot.onCommand("/debug")
         { msg, _ ->
             db.connect()
             val dbProcessor = DbProcessor(db.getConnection()!!)
@@ -159,8 +155,9 @@ open class Bot {
             println(teamsRS?.getString(1))
             println(managersRS?.getString(1))
             db.close()
-        }
+        }*/
 
+/*
         bot.onCommand("/db_execute") { msg, _ ->
             db.connect()
             val dbProcessor = DbProcessor(db.getConnection()!!)
@@ -173,9 +170,18 @@ open class Bot {
 
             db.close()
         }
+*/
+
+
+        bot.onCommand("/service")
+        { msg, _ ->
+            bot.sendMessage(msg.chat.id, adminController.serviceStatus())
+        }
+
 
         bot.onCallbackQuery("like") {
             vote.vote(it, bot, "like", 0)
+            println("like sended")
         }
         bot.onCallbackQuery("dislike") {
             vote.vote(it, bot, "dislike", 1)
@@ -183,7 +189,6 @@ open class Bot {
         bot.onCallbackQuery("bue") {
             vote.vote(it, bot, "bue", 2)
         }
-
         bot.start()
     }
 }
