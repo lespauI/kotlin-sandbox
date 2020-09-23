@@ -28,7 +28,7 @@ class DaddyProcessor @Autowired constructor(
     val logger = LoggerFactory.getLogger(javaClass)
 
     val playerOverCss = ".pull-right.cfm-team-ovr"
-    val link = "http://daddyleagues.com/uflrus"
+    val link = "https://daddyleagues.com/uflrus"
 
     val bot = Bot(token)
 
@@ -94,6 +94,7 @@ class DaddyProcessor @Autowired constructor(
 
                 //TODO refactor
                 val link = message.replaceBefore("http://", "")
+                        .replace("http://", "https://")
                 logger.info("link = $link")
                 Configuration.browserSize = "1288x538"
                 Selenide.open(link)
@@ -136,7 +137,7 @@ class DaddyProcessor @Autowired constructor(
                             "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
                     message.contains("Signed") -> gif = "https://media.giphy.com/media/KHVexxqBrUvAfjhfAg/giphy.gif"
                 }
-                val link = message.replaceBefore("http://", "")
+                val link = message.replaceBefore("http://", "").replace("http://", "https://")
                 Selenide.open(link)
                 Thread.sleep(6000)
                 var over = Selenide.element(By.cssSelector(playerOverCss)).text()
@@ -148,6 +149,7 @@ class DaddyProcessor @Autowired constructor(
 
             message.toLowerCase().contains("trade") -> {
                 val link = message.replaceBefore("http://", "")
+                        .replace("http://", "https://")
 
                 if (message.contains("submitted")) {
 /*
@@ -229,7 +231,7 @@ class DaddyProcessor @Autowired constructor(
 
     private fun login() {
         try {
-            Selenide.open("http://www.daddyleagues.com/login")
+            Selenide.open("https://www.daddyleagues.com/login")
             Selenide.element("#username").sendKeys("lespaul1488")
             Selenide.element("#password").sendKeys("demonvanal")
             Selenide.element("#loginForm > button").click()

@@ -1,12 +1,17 @@
 package data.bot
 
 import com.elbekD.bot.Bot
+import com.elbekD.bot.feature.chain.chain
 import com.elbekD.bot.types.InlineKeyboardButton
 import com.elbekD.bot.types.InlineKeyboardMarkup
+import com.elbekD.bot.types.KeyboardButton
+import com.elbekD.bot.types.ReplyKeyboardMarkup
+import data.Voters
 import kt.sandbox.data.Elo
 import kt.sandbox.data.Waiver
 import kt.sandbox.utils.database.DbConnector
 import kt.sandbox.utils.database.DbProcessor
+import utils.VoteProcessor
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -15,6 +20,7 @@ open class Bot {
 
 
     val db = DbConnector()
+    val vote = VoteProcessor()
 
     val adminController = AdminController()
     var wlist: List<String> = listOf()
@@ -64,8 +70,7 @@ open class Bot {
         .build()
          */
 
-        bot.chain("/waiver_list") {
-            msg ->
+        bot.chain("/waiver_list") { msg ->
             db.connect()
 
             val list: MutableList<String> = ArrayList<String>()
@@ -85,7 +90,7 @@ open class Bot {
                     one_time_keyboard = true
             )
 
-            bot.sendMessage(msg.chat.id, list.toString().replace(Regex(", |\\[|\\]"), ""), markup =  rkm)
+            bot.sendMessage(msg.chat.id, list.toString().replace(Regex(", |\\[|\\]"), ""), markup = rkm)
 
             db.close()
         }.build()
@@ -100,12 +105,12 @@ open class Bot {
             when (msg.text) {
                 "Да", "да" -> {
                     db.connect()
-                    wlist.forEach{
+                    wlist.forEach {
                         db.executeQuery("INSERT INTO waiver (text) VALUES (\"$it\")")
                     }
-                        bot.sendMessage(msg.chat.id, "Добавленно в бд")
-                        db.close()
-                    }
+                    bot.sendMessage(msg.chat.id, "Добавленно в бд")
+                    db.close()
+                }
                 "Нет", "нет" -> bot.sendMessage(msg.chat.id, "Давай заново")
                 else -> bot.sendMessage(msg.chat.id, "Oops, I don't understand you. Just answer yes or no?")
             }
@@ -113,14 +118,14 @@ open class Bot {
 
         bot.onCommand("/elo")
         { msg, _ ->
-      /* methods for waiver logic
-            1. гет эло
-            2. сет эло
-            3. апдейт эло
-            4. флюш эло
+            /* methods for waiver logic
+                  1. гет эло
+                  2. сет эло
+                  3. апдейт эло
+                  4. флюш эло
 
-            все начинают с 1200 эло
-        */
+                  все начинают с 1200 эло
+              */
             db.connect()
             val dbProcessor = DbProcessor(db.getConnection()!!)
 
@@ -170,55 +175,13 @@ open class Bot {
         }
 
         bot.onCallbackQuery("like") {
-            var like = Integer.parseInt(
-                it.message!!.reply_markup!!.inline_keyboard[0][0].text.split(" ")[1]
-            )
-            like += 1
-            bot.editMessageReplyMarkup(
-                chatId = it.message?.chat?.id, messageId = it.message?.message_id, markup = InlineKeyboardMarkup(
-                    listOf(
-                        listOf(
-                            InlineKeyboardButton("👍 $like", callback_data = "like"),
-                            it.message!!.reply_markup!!.inline_keyboard[0][1],
-                            it.message!!.reply_markup!!.inline_keyboard[0][2]
-                        )
-                    )
-                )
-            )
+            vote.vote(it, bot, "like", 0)
         }
         bot.onCallbackQuery("dislike") {
-            var like = Integer.parseInt(
-                it.message!!.reply_markup!!.inline_keyboard[0][1].text.split(" ")[1]
-            )
-            like += 1
-            bot.editMessageReplyMarkup(
-                chatId = it.message?.chat?.id, messageId = it.message?.message_id, markup = InlineKeyboardMarkup(
-                    listOf(
-                        listOf(
-                            it.message!!.reply_markup!!.inline_keyboard[0][0],
-                            InlineKeyboardButton("👎 $like", callback_data = "dislike"),
-                            it.message!!.reply_markup!!.inline_keyboard[0][2]
-                        )
-                    )
-                )
-            )
+            vote.vote(it, bot, "dislike", 1)
         }
         bot.onCallbackQuery("bue") {
-            var like = Integer.parseInt(
-                it.message!!.reply_markup!!.inline_keyboard[0][2].text.split(" ")[1]
-            )
-            like += 1
-            bot.editMessageReplyMarkup(
-                chatId = it.message?.chat?.id, messageId = it.message?.message_id, markup = InlineKeyboardMarkup(
-                    listOf(
-                        listOf(
-                            it.message!!.reply_markup!!.inline_keyboard[0][0],
-                            it.message!!.reply_markup!!.inline_keyboard[0][1],
-                            InlineKeyboardButton("🤢 $like", callback_data = "bue")
-                        )
-                    )
-                )
-            )
+            vote.vote(it, bot, "bue", 2)
         }
 
         bot.start()
