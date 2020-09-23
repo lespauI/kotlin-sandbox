@@ -28,7 +28,7 @@ class DaddyProcessor @Autowired constructor(
     val logger = LoggerFactory.getLogger(javaClass)
 
     val playerOverCss = ".pull-right.cfm-team-ovr"
-    val link = "https://daddyleagues.com/uflrus"
+    val home_page = "https://daddyleagues.com/uflrus"
 
     val bot = Bot(token)
 
@@ -50,6 +50,7 @@ class DaddyProcessor @Autowired constructor(
         if (message == "")
             message = body["text"].orEmpty()
         logger.info("message = $message")
+        message = message.replace("http://", "https://")
         var status = false
 
         if (body["type"].equals("tradeblock")) {
@@ -89,12 +90,10 @@ class DaddyProcessor @Autowired constructor(
     }
 
     private fun executeAction(chat_id: Long, message: String): Boolean {
+        val link = message.replaceBefore("https://", "")
         when {
             message.contains("gamerecap") -> {
-
-                //TODO refactor
-                val link = message.replaceBefore("http://", "")
-                        .replace("http://", "https://")
+               //TODO refactor
                 logger.info("link = $link")
                 Configuration.browserSize = "1288x538"
                 Selenide.open(link)
@@ -112,7 +111,7 @@ class DaddyProcessor @Autowired constructor(
 
                 clearCache()
                 Thread.sleep(5000)
-                Selenide.open(link)
+                Selenide.open(home_page)
                 Thread.sleep(2000)
 
                 bot.sendPic(
@@ -137,7 +136,6 @@ class DaddyProcessor @Autowired constructor(
                             "https://media.giphy.com/media/QVJanBtVwKFSFxxz3Z/giphy.gif"
                     message.contains("Signed") -> gif = "https://media.giphy.com/media/KHVexxqBrUvAfjhfAg/giphy.gif"
                 }
-                val link = message.replaceBefore("http://", "").replace("http://", "https://")
                 Selenide.open(link)
                 Thread.sleep(6000)
                 var over = Selenide.element(By.cssSelector(playerOverCss)).text()
@@ -148,8 +146,6 @@ class DaddyProcessor @Autowired constructor(
             }
 
             message.toLowerCase().contains("trade") -> {
-                val link = message.replaceBefore("http://", "")
-                        .replace("http://", "https://")
 
                 if (message.contains("submitted")) {
 /*
@@ -175,11 +171,6 @@ class DaddyProcessor @Autowired constructor(
                             Selenide.element(By.cssSelector(".col-xl-10 .row")).getScreenshotAs(FILE),
                             "$message #trade"
                     )
-                    //bot.sendPool(
-                    //     -1001275286257,
-                    //    //-273770462,
-                    //    "Одобряем?", "Да", "Нет", "Дал бы больше!"
-                    //)
                 }
                 return true
             }
@@ -224,7 +215,7 @@ class DaddyProcessor @Autowired constructor(
 
     private fun clearCache() {
         login()
-        Selenide.open("$link/admin")
+        Selenide.open("$home_page/admin")
         Selenide.element(".btn.btn-info.ajax").click()
         Selenide.closeWebDriver()
     }
@@ -244,7 +235,7 @@ class DaddyProcessor @Autowired constructor(
 
     fun getSchedules(chat_id: Long, msg: String) {
         Configuration.browserSize = "1288x1288"
-        Selenide.open("$link/schedules")
+        Selenide.open("$home_page/schedules")
         bot.sendPic(
                 chat_id,
                 Selenide.element(By.cssSelector("#scores")).getScreenshotAs(FILE),
@@ -253,7 +244,7 @@ class DaddyProcessor @Autowired constructor(
     }
 
     fun getGameOfTheWeek(chat_id: Long) {
-        Selenide.open(link)
+        Selenide.open(home_page)
         Thread.sleep(6000)
         bot.sendPic(
                 chat_id,
