@@ -53,11 +53,15 @@ class DaddyProcessor @Autowired constructor(
         message = message.replace("http://", "https://")
         var status = false
 
-        if (body["type"].equals("tradeblock") && !messages.contains(message)) {
+        if (messages.contains(message)) {
+            //todo
+            sendDebug(message + "\n#e100 Row is duplicated")
+        }
+        else if (body["type"].equals("tradeblock")) {
             messages.add(message)
             executeTradeBlock(chat_id, body)
 
-        } else if (!messages.contains(message)) {
+        } else {
             messages.add(message)
             try {
                 status = executeAction(chat_id, message)
@@ -85,9 +89,6 @@ class DaddyProcessor @Autowired constructor(
             }
             if (messages.size >= 100)
                 messages.removeAll(messages.subList(0, messages.size - 30))
-        } else {
-            //todo
-            sendDebug(message + "\n#e100 Row is duplicated")
         }
     }
 
