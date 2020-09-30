@@ -53,8 +53,10 @@ class DaddyProcessor @Autowired constructor(
         message = message.replace("http://", "https://")
         var status = false
 
-        if (body["type"].equals("tradeblock")) {
+        if (body["type"].equals("tradeblock") && !messages.contains(message)) {
+            messages.add(message)
             executeTradeBlock(chat_id, body)
+
         } else if (!messages.contains(message)) {
             messages.add(message)
             try {
@@ -93,7 +95,7 @@ class DaddyProcessor @Autowired constructor(
         val link = message.replaceBefore("https://", "")
         when {
             message.contains("gamerecap") -> {
-               //TODO refactor
+                //TODO refactor
                 logger.info("link = $link")
                 Configuration.browserSize = "1288x538"
                 Selenide.open(link)
